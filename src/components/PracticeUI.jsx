@@ -19,15 +19,27 @@ export default function PracticeUI({ user, onEndSession }) {
   const TOPICS = ["Bilangan", "Aljabar", "Geometri", "Statistika", "Peluang"];
   const [selectedTopic, setSelectedTopic] = useState("Bilangan");
 
+  const [errorMsg, setErrorMsg] = useState('');
+
   const startAIGeneration = async () => {
      setLoadingAI(true);
+     setErrorMsg('');
      try {
         const generated = await generateQuestions(selectedTopic, user.level);
-        setSessionQs(generated);
+        if (generated && generated.length > 0) {
+            setSessionQs(generated);
+        } else {
+            setErrorMsg("AI tidak mengembalikan soal dengan format yang benar.");
+        }
      } catch (err) {
-        alert("Gagal menggenerate pertanyaan dari AI: " + err.message);
+        setErrorMsg("API Key tidak valid atau terjadi gangguan AI. Pesan: " + err.message);
      }
      setLoadingAI(false);
+  };
+
+  const handleResetConfig = () => {
+      localStorage.removeItem("geminiApiKey");
+      window.location.reload();
   };
 
   if (sessionQs.length === 0) {
@@ -37,6 +49,15 @@ export default function PracticeUI({ user, onEndSession }) {
               <h2 className="title mb-4">Pilih Topik Latihan</h2>
               <p className="subtitle mb-6">AI akan membuatkan 10 soal unik dengan konteks dunia nyata berdasarkan levelmu (Lvl {user.level}).</p>
               
+              {errorMsg && (
+                 <div className="badge badge-danger mb-6 w-full p-4 flex justify-between items-center" style={{textAlign: 'left'}}>
+                    <span>{errorMsg}</span>
+                    <button className="btn btn-sm shadow-none" style={{background: 'rgba(255,255,255,0.2)', marginLeft: '1rem'}} onClick={handleResetConfig}>
+                       Reset API Key
+                    </button>
+                 </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4 mb-8">
                  {TOPICS.map(topic => (
                     <button key={topic} className={`btn ${selectedTopic === topic ? 'btn-primary shadow-glow' : 'btn-outline shadow-none'}`} onClick={() => setSelectedTopic(topic)}>
