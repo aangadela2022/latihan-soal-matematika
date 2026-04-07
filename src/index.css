@@ -213,6 +213,8 @@ body {
 .mb-4 { margin-bottom: 1rem; }
 .mb-6 { margin-bottom: 1.5rem; }
 .w-full { width: 100%; }
+.bg-transparent { background: transparent; }
+.outline-none { outline: none; border: none; }
 .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
 
 .option-btn {
