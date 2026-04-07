@@ -4,15 +4,20 @@ import { getFirestore } from "firebase/firestore";
 export let firebaseApp = null;
 export let db = null;
 
-// The config will be loaded from localStorage when the app boots
-export const initFirebase = () => {
-    const storedConfig = localStorage.getItem("firebaseConfig");
-    if (!storedConfig) return false;
+const firebaseConfig = {
+  apiKey: "AIzaSyA-FGwJ-XaVGAve7Mhpz8aMtemZEEVhOEE",
+  authDomain: "latihan-soal-matematika.firebaseapp.com",
+  projectId: "latihan-soal-matematika",
+  storageBucket: "latihan-soal-matematika.firebasestorage.app",
+  messagingSenderId: "684723272865",
+  appId: "1:684723272865:web:f0c254f795075b675c04e0",
+  measurementId: "G-H874VNBW7P"
+};
 
+export const initFirebase = () => {
     try {
-        const config = JSON.parse(storedConfig);
         if (!getApps().length) {
-            firebaseApp = initializeApp(config);
+            firebaseApp = initializeApp(firebaseConfig);
         } else {
             firebaseApp = getApps()[0];
         }
@@ -24,8 +29,7 @@ export const initFirebase = () => {
     }
 };
 
-// Also expose a function to save config
+// Expose a dummy function to keep compatibility with App.jsx
 export const saveFirebaseConfig = (configStr) => {
-    localStorage.setItem("firebaseConfig", configStr);
     return initFirebase();
 };

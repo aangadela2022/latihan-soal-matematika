@@ -1,28 +1,30 @@
 import React, { useState } from 'react';
 import { saveFirebaseConfig } from '../firebase';
 import { saveGeminiKey } from '../aiConfig';
-import { Database, Key, CheckCircle } from 'lucide-react';
+import { Key, CheckCircle } from 'lucide-react';
 
 export default function ConfigUI({ onConfigComplete }) {
-  const [fbConfig, setFbConfig] = useState('');
   const [gkConfig, setGkConfig] = useState('');
   const [error, setError] = useState('');
 
   const handleSave = () => {
+    if (!gkConfig.trim()) {
+      setError('Gemini API Key tidak boleh kosong.');
+      return;
+    }
+
     try {
-       // Validate JSON
-       JSON.parse(fbConfig);
-       
-       const fbSuccess = saveFirebaseConfig(fbConfig);
+       // Firebase is hardcoded now, we just call saveFirebaseConfig to trigger init
+       const fbSuccess = saveFirebaseConfig();
        const genSuccess = saveGeminiKey(gkConfig);
 
        if (fbSuccess && genSuccess) {
           onConfigComplete();
        } else {
-          setError('Gagal menginisialisasi. Cek format config JSON dan pastikan API Key tidak kosong.');
+          setError('Gagal menginisialisasi. Pastikan API Key valid.');
        }
     } catch (e) {
-       setError('Format Firebase Config harus berupa JSON valid dari Firebase Console.');
+       setError('Terjadi kesalahan saat menyimpan konfigurasi.');
     }
   };
 
@@ -31,26 +33,13 @@ export default function ConfigUI({ onConfigComplete }) {
       <div className="glass-panel" style={{maxWidth: '600px', width: '100%'}}>
         <div className="flex justify-center mb-4">
           <div style={{background: 'var(--primary)', padding: '1rem', borderRadius: '50%'}}>
-            <Database size={40} color="white" />
+            <Key size={40} color="white" />
           </div>
         </div>
         <h1 className="title text-center" style={{fontSize: '2rem'}}>Setup Workspace (Lokal)</h1>
-        <p className="subtitle text-center" style={{marginBottom: '2rem'}}>Amankan konfigurasi Anda di browser ini, 100% aman tanpa eksposur kode server.</p>
+        <p className="subtitle text-center" style={{marginBottom: '2rem'}}>Firebase sudah disiapkan. Silakan masukkan Gemini API Key Anda untuk melanjutkan.</p>
         
         {error && <div className="badge badge-danger mb-4 w-full p-4">{error}</div>}
-
-        <div className="mb-4">
-           <label className="block text-sm mb-2" style={{color: 'var(--text-muted)'}}>
-             Firebase Configuration JSON Object (Copy from Console)
-           </label>
-           <textarea 
-             className="w-full p-4" 
-             style={{background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', minHeight: '150px'}}
-             placeholder='{"apiKey": "AIz...", "authDomain": "...", ...}'
-             value={fbConfig}
-             onChange={(e) => setFbConfig(e.target.value)}
-           ></textarea>
-        </div>
 
         <div className="mb-6">
            <label className="block text-sm mb-2" style={{color: 'var(--text-muted)'}}>
