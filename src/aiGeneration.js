@@ -24,7 +24,7 @@ Format objeknya wajib seperti ini:
   }
 ]`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro", generationConfig: { temperature: 0.7 }});
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { temperature: 0.7 }});
     
     try {
         const result = await model.generateContent(prompt);
