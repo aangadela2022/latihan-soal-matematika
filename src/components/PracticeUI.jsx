@@ -25,7 +25,7 @@ export default function PracticeUI({ user, onEndSession }) {
         const generated = await generateQuestions(selectedTopic, user.level);
         setSessionQs(generated);
      } catch (err) {
-        alert("Gagal menggenerate pertanyaan dari AI. Pastikan API Key Gemini benar.");
+        alert("Gagal menggenerate pertanyaan dari AI: " + err.message);
      }
      setLoadingAI(false);
   };
