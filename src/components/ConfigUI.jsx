@@ -48,7 +48,7 @@ export default function ConfigUI({ onConfigComplete }) {
            <div className="flex items-center" style={{background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '0.5rem 1rem'}}>
              <Key size={20} color="var(--text-muted)" className="mr-2" />
              <input 
-               type="password" 
+               type="text" 
                className="w-full bg-transparent outline-none" 
                style={{color: 'white', padding: '0.5rem'}}
                placeholder="AIzaSyA..."
