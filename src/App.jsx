@@ -5,47 +5,41 @@ import StudentUI from './components/StudentUI';
 import TeacherUI from './components/TeacherUI';
 import PracticeUI from './components/PracticeUI';
 
-import { initFirebase } from './firebase';
-import { initAI } from './aiConfig';
-import { fetchUsers } from './dbServices';
+import { fetchUsers, addUser } from './dbServices';
 
 function App() {
-  const [isConfigured, setIsConfigured] = useState(false);
-  const [view, setView] = useState('loading'); // loading, config, admin, student_dash, teacher_dash, practice
+  const [view, setView] = useState('loading'); // loading, admin, student_dash, teacher_dash, practice
   const [currentUser, setCurrentUser] = useState(null);
 
-  const bypassLogin = async () => {
+  const initLocalApp = async () => {
     try {
-      const users = await fetchUsers();
-      if (users && users.length > 0) {
+      let users = await fetchUsers();
+      if (!users || users.length === 0) {
+        // Otomatis buat Siswa Utama pertama kali
+        const INIT_TOPICS = () => ({ "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 } });
+        const defaultUser = {
+          nama: 'Siswa Utama',
+          role: 'siswa',
+          kelas: 'Lokal',
+          level: 1,
+          xp: 0,
+          analytics: INIT_TOPICS(),
+          history: []
+        };
+        const createdUser = await addUser(defaultUser);
+        handleLogin(createdUser);
+      } else {
         const student = users.find(u => u.role === 'siswa');
         handleLogin(student || users[0]);
-      } else {
-        handleLogin({ id: 'guest', nama: 'Siswa Tamu', role: 'siswa', level: 1, xp: 0, analytics: {}, history: [] });
       }
     } catch (err) {
-      console.error("Bypass login failed", err);
-      handleLogin({ id: 'guest', nama: 'Siswa Tamu', role: 'siswa', level: 1, xp: 0, analytics: {}, history: [] });
+      console.error("Initialization failed", err);
     }
   };
 
   useEffect(() => {
-    // Check local storage 
-    const isFb = initFirebase();
-    const isAi = initAI();
-
-    if (isFb && isAi) {
-       setIsConfigured(true);
-       bypassLogin();
-    } else {
-       setView('config');
-    }
+    initLocalApp();
   }, []);
-
-  const handleConfigComplete = () => {
-    setIsConfigured(true);
-    bypassLogin();
-  };
 
   const handleLogin = (user) => {
     setCurrentUser(user);
@@ -53,17 +47,16 @@ function App() {
   };
 
   const handleLogout = () => {
-    // Reload halaman jika logout karena tidak ada login page
+    // Reload halaman jika logout
     window.location.reload();
   };
 
   if (view === 'loading') {
-     return <div className="animate-fade-in text-center mt-20 subtitle">Memuat konfigurasi keamanan...</div>;
+     return <div className="animate-fade-in text-center mt-20 subtitle">Menyiapkan memori lokal aplikasi...</div>;
   }
 
-  if (view === 'config') return <ConfigUI onConfigComplete={handleConfigComplete} />;
-  
-  if (view === 'admin') return <AdminUI onBack={bypassLogin} />;
+  // Jika perlu mode seeding untuk admin
+  if (view === 'admin') return <AdminUI onBack={initLocalApp} />;
 
   if (view === 'teacher_dash') return <TeacherUI user={currentUser} onLogout={handleLogout} />;
 
@@ -75,3 +68,4 @@ function App() {
 }
 
 export default App;
+

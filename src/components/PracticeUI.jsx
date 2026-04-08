@@ -131,17 +131,15 @@ export default function PracticeUI({ user, onEndSession }) {
           xpDidapat: sessionScore.totalXpDidapat
        };
 
-       // 1. Coba simpan ke database jika bukan guest
-       if (user.id !== 'guest') {
-           try {
-               await updateUserStats(user.id, localXp, localAnalytics, newLevel);
-               await addSessionHistory(user.id, historyObj);
-           } catch (e) {
-               console.warn("Gagal menyimpan ke database, berlanjut dengan data lokal:", e);
-           }
+       // Simpan ke database (lokal storage)
+       try {
+           await updateUserStats(user.id, localXp, localAnalytics, newLevel);
+           await addSessionHistory(user.id, historyObj);
+       } catch (e) {
+           console.warn("Gagal menyimpan ke database lokal:", e);
        }
 
-       // 2. Selalu update objek state (memory) agar UI tetap sinkron walau offline/guest
+       // Update objek state (memory) agar UI sinkron
        user.xp = localXp;
        user.analytics = localAnalytics;
        user.level = newLevel;
