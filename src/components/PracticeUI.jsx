@@ -115,42 +115,41 @@ export default function PracticeUI({ user, onEndSession }) {
        setSelectedOpt(null);
        setShowFeedback(false);
     } else {
-       try {
-           const sessAnalytics = localAnalytics[selectedTopic];
-           let newLevel = user.level;
-           if (sessAnalytics.total >= 10 && sessAnalytics.correct / sessAnalytics.total >= 0.7 && user.level < 3) {
-              newLevel += 1;
-           } else if (sessAnalytics.total >= 10 && sessAnalytics.correct / sessAnalytics.total <= 0.3 && user.level > 1) {
-              newLevel -= 1;
-           }
-
-           await updateUserStats(user.id, localXp, localAnalytics, newLevel);
-           
-           // Penambahan Riwayat
-           const historyObj = {
-              tanggal: new Date().toISOString(),
-              topik: selectedTopic,
-              jumlahBenar: sessionScore.benar,
-              totalSoal: sessionQs.length,
-              xpDidapat: sessionScore.totalXpDidapat
-           };
-           
-           await addSessionHistory(user.id, historyObj);
-
-           // Update user di memory untuk komponen lain
-           user.xp = localXp;
-           user.analytics = localAnalytics;
-           user.level = newLevel;
-           if (!user.history) user.history = [];
-           user.history.push(historyObj);
-
-           alert(`Sesi Selesai! XP mu: ${localXp}. Level mu sekarang: ${newLevel}`);
-           onEndSession();
-       } catch (e) {
-           console.error("Gagal save", e);
-           alert("Selesai, namun gagal menyimpan progres ke database.");
-           onEndSession();
+       const sessAnalytics = localAnalytics[selectedTopic];
+       let newLevel = user.level;
+       if (sessAnalytics && sessAnalytics.total >= 10 && sessAnalytics.correct / sessAnalytics.total >= 0.7 && user.level < 3) {
+          newLevel += 1;
+       } else if (sessAnalytics && sessAnalytics.total >= 10 && sessAnalytics.correct / sessAnalytics.total <= 0.3 && user.level > 1) {
+          newLevel -= 1;
        }
+
+       const historyObj = {
+          tanggal: new Date().toISOString(),
+          topik: selectedTopic,
+          jumlahBenar: sessionScore.benar,
+          totalSoal: sessionQs.length,
+          xpDidapat: sessionScore.totalXpDidapat
+       };
+
+       // 1. Coba simpan ke database jika bukan guest
+       if (user.id !== 'guest') {
+           try {
+               await updateUserStats(user.id, localXp, localAnalytics, newLevel);
+               await addSessionHistory(user.id, historyObj);
+           } catch (e) {
+               console.warn("Gagal menyimpan ke database, berlanjut dengan data lokal:", e);
+           }
+       }
+
+       // 2. Selalu update objek state (memory) agar UI tetap sinkron walau offline/guest
+       user.xp = localXp;
+       user.analytics = localAnalytics;
+       user.level = newLevel;
+       if (!user.history) user.history = [];
+       user.history.push(historyObj);
+
+       alert(`Sesi Selesai! XP mu bertambah. Total XP: ${localXp}.`);
+       onEndSession();
     }
   };
 
