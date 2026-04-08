@@ -1,51 +1,75 @@
-import React, { useEffect, useState } from 'react';
-import { fetchUsers } from '../dbServices';
-import { BookOpen, User, Users, ChevronRight, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { BookOpen, LogIn, Settings } from 'lucide-react';
 
-export default function LoginUI({ onLogin, onOpenAdmin }) {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function LoginUI({ onLoginSuccess, onOpenAdmin }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchUsers()
-      .then(data => { setUsers(data); setLoading(false); })
-      .catch(err => { console.error("Error fetching users", err); setLoading(false); });
-  }, []);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (username.toLowerCase() === 'matematika' && password === 'mudah') {
+      setError('');
+      onLoginSuccess();
+    } else {
+      setError('Username atau password salah.');
+    }
+  };
 
   return (
     <div className="container flex flex-col items-center justify-center animate-fade-in" style={{minHeight: '100vh'}}>
-      <div className="glass-panel" style={{maxWidth: '400px', width: '100%', textAlign: 'center'}}>
-        <div className="flex justify-between items-start w-full">
+      <div className="glass-panel hover-glow" style={{maxWidth: '430px', width: '100%', textAlign: 'center'}}>
+        <div className="flex justify-between items-start w-full mb-6">
            <div style={{width: '24px'}}></div> {/* Spacer */}
-           <div style={{background: 'var(--primary)', padding: '1rem', borderRadius: '50%', marginBottom: '1rem'}}>
-             <BookOpen size={40} color="white" />
+           <div style={{background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '1.2rem', borderRadius: '50%', boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)'}}>
+             <BookOpen size={48} color="white" />
            </div>
            <button onClick={onOpenAdmin} className="text-muted hover:text-white transition-colors" title="Buka Mode Admin (Seeding)">
              <Settings size={20} />
            </button>
         </div>
         
-        <h1 className="title" style={{fontSize: '2rem'}}>Numerasi Cerdas</h1>
-        <p className="subtitle">Membangun Nalar Numerasi dengan AI</p>
+        <h1 className="title" style={{fontSize: '2.2rem', marginBottom: '0.5rem'}}>Numerasi Cerdas</h1>
+        <p className="subtitle mb-8" style={{fontSize: '1rem'}}>Platform Pelatihan Matematika Logis</p>
         
-        <div className="grid grid-cols-1 gap-4 mt-8">
-          {loading ? (
-             <p className="text-muted">Memuat akun pengguna...</p>
-          ) : users.length === 0 ? (
-             <div className="badge badge-warning p-3">Belum ada akun. Klik ikon gir di pojok kanan atas untuk menambah user (Admin Seeding).</div>
-          ) : (
-             users.map(u => (
-                <button key={u.id} className="btn btn-outline flex items-center justify-between" onClick={() => onLogin(u)}>
-                  <div className="flex items-center gap-2">
-                    {u.role === 'guru' ? <Users size={20} /> : <User size={20} />}
-                    <span>{u.nama} ({u.role})</span>
-                  </div>
-                  <ChevronRight size={16} />
-                </button>
-             ))
-          )}
-        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 text-left">
+          
+          {error && <div className="badge badge-danger p-3 text-center">{error}</div>}
+          
+          <div>
+             <label className="block text-sm mb-2" style={{color: 'var(--text-muted)'}}>Username</label>
+             <input 
+                type="text" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full p-4 rounded" 
+                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', color: 'white', outlint: 'none', transition: 'border 0.3s'}}
+                placeholder="Masukkan username..."
+                autoComplete="off"
+             />
+          </div>
+          
+          <div>
+             <label className="block text-sm mb-2" style={{color: 'var(--text-muted)'}}>Password</label>
+             <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-4 rounded" 
+                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', color: 'white'}}
+                placeholder="Masukkan password..."
+             />
+          </div>
+          
+          <button type="submit" className="btn btn-primary shadow-glow mt-4 p-4 text-lg flex items-center justify-center gap-2">
+             <LogIn size={20} /> Masuk ke Aplikasi
+          </button>
+        </form>
       </div>
+      
+      <p className="mt-8 text-sm" style={{color: 'var(--text-muted)'}}>
+        &copy; {new Date().getFullYear()} Numerasi Cerdas
+      </p>
     </div>
   );
 }

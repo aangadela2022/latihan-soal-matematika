@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ConfigUI from './components/ConfigUI';
+import LoginUI from './components/LoginUI';
 import AdminUI from './components/AdminUI';
 import StudentUI from './components/StudentUI';
 import TeacherUI from './components/TeacherUI';
@@ -8,10 +8,11 @@ import PracticeUI from './components/PracticeUI';
 import { fetchUsers, addUser } from './dbServices';
 
 function App() {
-  const [view, setView] = useState('loading'); // loading, admin, student_dash, teacher_dash, practice
+  const [view, setView] = useState('login'); // login, loading, admin, student_dash, teacher_dash, practice
   const [currentUser, setCurrentUser] = useState(null);
 
   const initLocalApp = async () => {
+    setView('loading');
     try {
       let users = await fetchUsers();
       if (!users || users.length === 0) {
@@ -37,26 +38,25 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    initLocalApp();
-  }, []);
-
   const handleLogin = (user) => {
     setCurrentUser(user);
     setView(user.role === 'siswa' ? 'student_dash' : 'teacher_dash');
   };
 
   const handleLogout = () => {
-    // Reload halaman jika logout
-    window.location.reload();
+    // Kembali ke login jika logout
+    setView('login');
+    setCurrentUser(null);
   };
+
+  if (view === 'login') return <LoginUI onLoginSuccess={initLocalApp} onOpenAdmin={() => setView('admin')} />;
 
   if (view === 'loading') {
      return <div className="animate-fade-in text-center mt-20 subtitle">Menyiapkan memori lokal aplikasi...</div>;
   }
 
   // Jika perlu mode seeding untuk admin
-  if (view === 'admin') return <AdminUI onBack={initLocalApp} />;
+  if (view === 'admin') return <AdminUI onBack={() => setView('login')} />;
 
   if (view === 'teacher_dash') return <TeacherUI user={currentUser} onLogout={handleLogout} />;
 
