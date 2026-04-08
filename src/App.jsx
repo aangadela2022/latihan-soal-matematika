@@ -1,18 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import ConfigUI from './components/ConfigUI';
 import AdminUI from './components/AdminUI';
-import LoginUI from './components/LoginUI';
 import StudentUI from './components/StudentUI';
 import TeacherUI from './components/TeacherUI';
 import PracticeUI from './components/PracticeUI';
 
 import { initFirebase } from './firebase';
 import { initAI } from './aiConfig';
+import { fetchUsers } from './dbServices';
 
 function App() {
   const [isConfigured, setIsConfigured] = useState(false);
-  const [view, setView] = useState('loading'); // loading, config, login, admin, student_dash, teacher_dash, practice
+  const [view, setView] = useState('loading'); // loading, config, admin, student_dash, teacher_dash, practice
   const [currentUser, setCurrentUser] = useState(null);
+
+  const bypassLogin = async () => {
+    try {
+      const users = await fetchUsers();
+      if (users && users.length > 0) {
+        const student = users.find(u => u.role === 'siswa');
+        handleLogin(student || users[0]);
+      } else {
+        handleLogin({ id: 'guest', nama: 'Siswa Tamu', role: 'siswa', level: 1, xp: 0, analytics: {}, history: [] });
+      }
+    } catch (err) {
+      console.error("Bypass login failed", err);
+      handleLogin({ id: 'guest', nama: 'Siswa Tamu', role: 'siswa', level: 1, xp: 0, analytics: {}, history: [] });
+    }
+  };
 
   useEffect(() => {
     // Check local storage 
@@ -21,7 +36,7 @@ function App() {
 
     if (isFb && isAi) {
        setIsConfigured(true);
-       setView('login');
+       bypassLogin();
     } else {
        setView('config');
     }
@@ -29,7 +44,7 @@ function App() {
 
   const handleConfigComplete = () => {
     setIsConfigured(true);
-    setView('login');
+    bypassLogin();
   };
 
   const handleLogin = (user) => {
@@ -38,8 +53,8 @@ function App() {
   };
 
   const handleLogout = () => {
-    setCurrentUser(null);
-    setView('login');
+    // Reload halaman jika logout karena tidak ada login page
+    window.location.reload();
   };
 
   if (view === 'loading') {
@@ -48,9 +63,7 @@ function App() {
 
   if (view === 'config') return <ConfigUI onConfigComplete={handleConfigComplete} />;
   
-  if (view === 'admin') return <AdminUI onBack={() => setView('login')} />;
-
-  if (view === 'login') return <LoginUI onLogin={handleLogin} onOpenAdmin={() => setView('admin')} />;
+  if (view === 'admin') return <AdminUI onBack={bypassLogin} />;
 
   if (view === 'teacher_dash') return <TeacherUI user={currentUser} onLogout={handleLogout} />;
 
