@@ -25,7 +25,7 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
     if (lowestRate >= 0.8) return "Daya analitis dan adaptasi Anda luar biasa di seluruh topik. Teruskan momentum ini!";
     
     const percentage = Math.round(lowestRate * 100);
-    return `AI mendeteksi kelemahan struktural pada konsep ${weakestTopic} (Akurasi: ${percentage}%). Sangat disarankan Anda berlatih topik tersebut.`;
+    return `Terdeteksi kelemahan struktural pada konsep ${weakestTopic} (Akurasi: ${percentage}%). Sangat disarankan Anda berlatih topik tersebut.`;
   };
 
   return (
@@ -64,7 +64,7 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
             <div className="glass-panel mb-8 hover-glow" style={{background: 'linear-gradient(to right, rgba(15,23,42,0.8), rgba(79,70,229,0.1))', borderLeft: '4px solid var(--primary)'}}>
                <div className="flex items-center gap-3 mb-2">
                   <Brain color="var(--primary)" size={20} className="glow-effect-subtle" />
-                  <h3 style={{fontWeight: 700, color: 'var(--primary)'}}>Personal AI Learning Coach</h3>
+                  <h3 style={{fontWeight: 700, color: 'var(--primary)'}}>Personal Learning Coach</h3>
                </div>
                <p style={{color: 'var(--text-main)', lineHeight: 1.6}}>
                   {calculateStudentWeakness(user.analytics)}
@@ -75,7 +75,7 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
               <TrendingUp size={48} color="var(--primary)" style={{margin: '0 auto 1.5rem'}} />
               <h1 className="title" style={{fontSize: '2.2rem'}}>Generative Adaptive Module</h1>
               <p className="subtitle" style={{maxWidth: '550px', margin: '0 auto 2rem'}}>
-                 Pilih topik, dan mesin Generative AI kami (Gemini) akan menyajikan studi kasus dunia nyata khusus untuk levelmu.
+                 Pilih topik, dan akan disajikan studi kasus dunia nyata khusus untuk levelmu.
               </p>
               <button className="btn btn-primary shadow-glow" style={{fontSize: '1.2rem', padding: '1rem 2.5rem', borderRadius: '50px'}} onClick={onStartPractice}>
                  Mulai Misi Numerasi <ChevronRight />

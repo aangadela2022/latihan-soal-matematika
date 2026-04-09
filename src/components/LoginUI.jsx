@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, LogIn, Settings } from 'lucide-react';
+import { BookOpen, LogIn } from 'lucide-react';
 
 export default function LoginUI({ onLoginSuccess, onOpenAdmin }) {
   const [username, setUsername] = useState('');
@@ -24,9 +24,7 @@ export default function LoginUI({ onLoginSuccess, onOpenAdmin }) {
            <div style={{background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '1.2rem', borderRadius: '50%', boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)'}}>
              <BookOpen size={48} color="white" />
            </div>
-           <button onClick={onOpenAdmin} className="text-muted hover:text-white transition-colors" title="Buka Mode Admin (Seeding)">
-             <Settings size={20} />
-           </button>
+           <div style={{width: '24px'}}></div> {/* Spacer */}
         </div>
         
         <h1 className="title" style={{fontSize: '2.2rem', marginBottom: '0.5rem'}}>Numerasi Cerdas</h1>
@@ -67,8 +65,9 @@ export default function LoginUI({ onLoginSuccess, onOpenAdmin }) {
         </form>
       </div>
       
-      <p className="mt-8 text-sm" style={{color: 'var(--text-muted)'}}>
-        &copy; {new Date().getFullYear()} Numerasi Cerdas
+      <p className="mt-8 text-sm text-center" style={{color: 'var(--text-muted)'}}>
+        &copy; {new Date().getFullYear()} Numerasi Cerdas<br />
+        created by Aang Adela, S.Si.
       </p>
     </div>
   );

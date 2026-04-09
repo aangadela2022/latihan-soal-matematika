@@ -4,11 +4,14 @@ import AdminUI from './components/AdminUI';
 import StudentUI from './components/StudentUI';
 import TeacherUI from './components/TeacherUI';
 import PracticeUI from './components/PracticeUI';
+import ConfigUI from './components/ConfigUI';
 
 import { fetchUsers, addUser } from './dbServices';
 
 function App() {
-  const [view, setView] = useState('login'); // login, loading, admin, student_dash, teacher_dash, practice
+  const [view, setView] = useState(() => {
+     return localStorage.getItem("geminiApiKey") ? 'login' : 'config';
+  });
   const [currentUser, setCurrentUser] = useState(null);
 
   const initLocalApp = async () => {
@@ -48,6 +51,8 @@ function App() {
     setView('login');
     setCurrentUser(null);
   };
+
+  if (view === 'config') return <ConfigUI onConfigComplete={() => setView('login')} />;
 
   if (view === 'login') return <LoginUI onLoginSuccess={initLocalApp} onOpenAdmin={() => setView('admin')} />;
 

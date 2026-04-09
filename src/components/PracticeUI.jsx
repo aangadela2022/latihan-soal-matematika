@@ -47,7 +47,7 @@ export default function PracticeUI({ user, onEndSession }) {
         <div className="container animate-fade-in flex flex-col items-center justify-center min-vh-100 mt-10">
            <div className="glass-panel hover-glow" style={{maxWidth: '600px', width: '100%', textAlign: 'center'}}>
               <h2 className="title mb-4">Pilih Topik Latihan</h2>
-              <p className="subtitle mb-6">AI akan membuatkan 10 soal unik dengan konteks dunia nyata berdasarkan levelmu (Lvl {user.level}).</p>
+              <p className="subtitle mb-6">Akan dibuatkan 10 soal unik dengan konteks dunia nyata berdasarkan levelmu (Lvl {user.level}).</p>
               
               {errorMsg && (
                  <div className="badge badge-danger mb-6 w-full p-4 flex justify-between items-center" style={{textAlign: 'left'}}>

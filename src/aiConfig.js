@@ -19,3 +19,6 @@ export const saveGeminiKey = (apiKey) => {
     localStorage.setItem("geminiApiKey", apiKey);
     return initAI();
 };
+
+// Auto-initialize when file is imported (on app boot)
+initAI();
