@@ -1,42 +1,82 @@
-// Gunakan localStorage sebagai ganti Firestore
+import { db } from './firebase';
+import { 
+    collection, 
+    getDocs, 
+    addDoc, 
+    updateDoc, 
+    doc, 
+    query, 
+    where, 
+    setDoc, 
+    getDoc,
+    arrayUnion
+} from "firebase/firestore";
 
 export const fetchUsers = async () => {
-    const data = localStorage.getItem("users");
-    if (!data) return [];
     try {
-        return JSON.parse(data);
-    } catch {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+        console.error("Error fetching users from Firestore", e);
         return [];
     }
 };
 
+export const findUserByName = async (nama) => {
+    try {
+        const q = query(collection(db, "users"), where("nama", "==", nama));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) return null;
+        const userDoc = querySnapshot.docs[0];
+        return { id: userDoc.id, ...userDoc.data() };
+    } catch (e) {
+        console.error("Error finding user", e);
+        return null;
+    }
+};
+
 export const addUser = async (userObj) => {
-    const users = await fetchUsers();
-    const newUser = { id: Date.now().toString(), ...userObj };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    return newUser;
+    try {
+        // use specific ID (NIS/NIP) if provided, otherwise let Firebase generate one
+        const userId = userObj.id || Date.now().toString();
+        const userRef = doc(db, "users", userId);
+        
+        const dataToSave = { 
+            ...userObj, 
+            xp: userObj.xp || 0,
+            level: userObj.level || 1,
+            analytics: userObj.analytics || {},
+            history: userObj.history || []
+        };
+        
+        await setDoc(userRef, dataToSave);
+        return { id: userId, ...dataToSave };
+    } catch (e) {
+        console.error("Error adding user to Firestore", e);
+        throw e;
+    }
 };
 
 export const updateUserStats = async (userId, xp, analytics, level) => {
-    const users = await fetchUsers();
-    const index = users.findIndex(u => u.id === userId);
-    if (index !== -1) {
-        users[index].xp = xp;
-        users[index].analytics = analytics;
-        users[index].level = level;
-        localStorage.setItem("users", JSON.stringify(users));
+    try {
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+            xp: xp,
+            analytics: analytics,
+            level: level
+        });
+    } catch (e) {
+        console.error("Error updating user stats", e);
     }
 };
 
 export const addSessionHistory = async (userId, sessionData) => {
-    const users = await fetchUsers();
-    const index = users.findIndex(u => u.id === userId);
-    if (index !== -1) {
-        if (!users[index].history) {
-            users[index].history = [];
-        }
-        users[index].history.push(sessionData);
-        localStorage.setItem("users", JSON.stringify(users));
+    try {
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+            history: arrayUnion(sessionData)
+        });
+    } catch (e) {
+        console.error("Error adding session history", e);
     }
 };

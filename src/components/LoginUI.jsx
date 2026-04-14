@@ -1,66 +1,114 @@
 import React, { useState } from 'react';
-import { BookOpen, LogIn } from 'lucide-react';
+import { BookOpen, LogIn, ShieldAlert } from 'lucide-react';
+import { findUserByName } from '../dbServices';
 
-export default function LoginUI({ onLoginSuccess, onOpenAdmin }) {
+export default function LoginUI({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [pass1, setPass1] = useState('');
+  const [pass2, setPass2] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username.toLowerCase() === 'matematika' && password === 'mudah') {
-      setError('');
-      onLoginSuccess();
-    } else {
-      setError('Username atau password salah.');
+    setError('');
+    setLoading(true);
+
+    const unameLower = username.toLowerCase();
+
+    // 1. Admin Check (Hardcoded)
+    if (unameLower === 'admin' && pass1 === 'serang12345') {
+      onLoginSuccess({ nama: 'Administrator', role: 'admin' });
+      setLoading(false);
+      return;
+    }
+
+    // 2. Guru/Siswa Check (Firestore)
+    try {
+      if (!username || !pass1 || !pass2) {
+        setError('Semua field harus diisi.');
+        setLoading(false);
+        return;
+      }
+
+      const user = await findUserByName(username);
+      
+      if (user) {
+        // Cek Password 1 (NIS/NIP) dan Password 2 (matematikamudah)
+        if (pass1 === user.id && pass2 === 'matematikamudah') {
+          onLoginSuccess(user);
+        } else {
+          setError('Password 1 (NIS/NIP) atau Password 2 salah.');
+        }
+      } else {
+        setError('Pengguna tidak ditemukan.');
+      }
+    } catch (err) {
+      setError('Terjadi gangguan koneksi.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="container flex flex-col items-center justify-center animate-fade-in" style={{minHeight: '100vh'}}>
       <div className="glass-panel hover-glow" style={{maxWidth: '430px', width: '100%', textAlign: 'center'}}>
-        <div className="flex justify-between items-start w-full mb-6">
-           <div style={{width: '24px'}}></div> {/* Spacer */}
+        <div className="flex justify-center w-full mb-6">
            <div style={{background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '1.2rem', borderRadius: '50%', boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)'}}>
              <BookOpen size={48} color="white" />
            </div>
-           <div style={{width: '24px'}}></div> {/* Spacer */}
         </div>
         
         <h1 className="title" style={{fontSize: '2.2rem', marginBottom: '0.5rem'}}>Numerasi Cerdas</h1>
         <p className="subtitle mb-8" style={{fontSize: '1rem'}}>Platform Pelatihan Matematika Logis</p>
         
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5 text-left">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
           
-          {error && <div className="badge badge-danger p-3 text-center">{error}</div>}
+          {error && <div className="badge badge-danger p-3 text-center flex items-center justify-center gap-2"><ShieldAlert size={16}/> {error}</div>}
           
           <div>
-             <label className="block text-sm mb-2" style={{color: 'var(--text-muted)'}}>Username</label>
+             <label className="block text-sm mb-1" style={{color: 'var(--text-muted)'}}>Username / Nama Lengkap</label>
              <input 
                 type="text" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full p-4 rounded" 
-                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', color: 'white', outlint: 'none', transition: 'border 0.3s'}}
-                placeholder="Masukkan username..."
+                className="w-full p-4 rounded text-white" 
+                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none'}}
+                placeholder="Masukkan nama..."
                 autoComplete="off"
+                required
              />
           </div>
           
           <div>
-             <label className="block text-sm mb-2" style={{color: 'var(--text-muted)'}}>Password</label>
+             <label className="block text-sm mb-1" style={{color: 'var(--text-muted)'}}>Password 1 (NIS/NIP)</label>
              <input 
                 type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-4 rounded" 
-                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', color: 'white'}}
-                placeholder="Masukkan password..."
+                value={pass1}
+                onChange={(e) => setPass1(e.target.value)}
+                className="w-full p-4 rounded text-white" 
+                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none'}}
+                placeholder="NIS atau NIP..."
+                required
+             />
+          </div>
+
+          <div>
+             <label className="block text-sm mb-1" style={{color: 'var(--text-muted)'}}>Password 2</label>
+             <input 
+                type="password" 
+                value={pass2}
+                onChange={(e) => setPass2(e.target.value)}
+                className="w-full p-4 rounded text-white" 
+                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none'}}
+                placeholder="Contoh: matematikamudah"
+                disabled={username.toLowerCase() === 'admin'}
+                required={username.toLowerCase() !== 'admin'}
              />
           </div>
           
-          <button type="submit" className="btn btn-primary shadow-glow mt-4 p-4 text-lg flex items-center justify-center gap-2">
-             <LogIn size={20} /> Masuk ke Aplikasi
+          <button type="submit" className="btn btn-primary shadow-glow mt-2 p-4 text-lg flex items-center justify-center gap-2" disabled={loading}>
+             {loading ? 'Memverifikasi...' : <><LogIn size={20} /> Masuk</>}
           </button>
         </form>
       </div>
