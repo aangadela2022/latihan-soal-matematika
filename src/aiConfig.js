@@ -8,6 +8,7 @@ export const initAI = () => {
 
     try {
         genAI = new GoogleGenerativeAI(storedKey);
+        console.log("Gemini AI initialized from localStorage");
         return true;
     } catch (e) {
         console.error("Gagal inisialisasi Gemini AI", e);
@@ -20,5 +21,5 @@ export const saveGeminiKey = (apiKey) => {
     return initAI();
 };
 
-// Auto-initialize when file is imported (on app boot)
+// Initial boot check
 initAI();

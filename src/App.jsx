@@ -7,10 +7,18 @@ import PracticeUI from './components/PracticeUI';
 import ConfigUI from './components/ConfigUI';
 
 import { fetchUsers, addUser } from './dbServices';
+import { initAI } from './aiConfig';
+import { initFirebase } from './firebase';
 
-function App() {
   const [view, setView] = useState(() => {
-     return localStorage.getItem("geminiApiKey") ? 'login' : 'config';
+     const hasKey = localStorage.getItem("geminiApiKey");
+     if (hasKey) {
+        // Run initializations early
+        initAI();
+        initFirebase();
+        return 'login';
+     }
+     return 'config';
   });
   const [currentUser, setCurrentUser] = useState(null);
 
