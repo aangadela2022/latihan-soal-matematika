@@ -74,8 +74,11 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
             <div className="glass-panel text-center hover-glow" style={{padding: '4rem 2rem', background: 'linear-gradient(135deg, rgba(79,70,229,0.1), rgba(236,72,153,0.1))'}}>
               <TrendingUp size={48} color="var(--primary)" style={{margin: '0 auto 1.5rem'}} />
               <h1 className="title" style={{fontSize: '2.2rem'}}>Generative Adaptive Module</h1>
-              <p className="subtitle" style={{maxWidth: '550px', margin: '0 auto 2rem'}}>
+              <p className="subtitle" style={{maxWidth: '550px', margin: '0 auto 1.5rem'}}>
                  Pilih topik, dan akan disajikan studi kasus dunia nyata khusus untuk levelmu.
+              </p>
+              <p style={{color: 'var(--text-muted)', fontStyle: 'italic', marginBottom: '2rem'}}>
+                 "Kerjakan setiap hari, dan kamu akan menguasainya"
               </p>
               <button className="btn btn-primary shadow-glow" style={{fontSize: '1.2rem', padding: '1rem 2.5rem', borderRadius: '50px'}} onClick={onStartPractice}>
                  Mulai Misi Numerasi <ChevronRight />
