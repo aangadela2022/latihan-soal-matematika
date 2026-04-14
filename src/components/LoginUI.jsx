@@ -67,41 +67,38 @@ export default function LoginUI({ onLoginSuccess }) {
           {error && <div className="badge badge-danger p-3 text-center flex items-center justify-center gap-2"><ShieldAlert size={16}/> {error}</div>}
           
           <div>
-             <label className="block text-sm mb-1" style={{color: 'var(--text-muted)'}}>Username / Nama Lengkap</label>
              <input 
                 type="text" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full p-4 rounded text-white" 
-                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none'}}
-                placeholder="Masukkan nama..."
+                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none', color: 'white'}}
+                placeholder="Username"
                 autoComplete="off"
                 required
              />
           </div>
           
           <div>
-             <label className="block text-sm mb-1" style={{color: 'var(--text-muted)'}}>Password 1 (NIS/NIP)</label>
              <input 
-                type="password" 
+                type="text" 
                 value={pass1}
                 onChange={(e) => setPass1(e.target.value)}
                 className="w-full p-4 rounded text-white" 
-                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none'}}
-                placeholder="NIS atau NIP..."
+                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none', color: 'white'}}
+                placeholder="Password 1"
                 required
              />
           </div>
 
           <div>
-             <label className="block text-sm mb-1" style={{color: 'var(--text-muted)'}}>Password 2</label>
              <input 
-                type="password" 
+                type="text" 
                 value={pass2}
                 onChange={(e) => setPass2(e.target.value)}
                 className="w-full p-4 rounded text-white" 
-                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none'}}
-                placeholder="Contoh: matematikamudah"
+                style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none', color: 'white'}}
+                placeholder="Password 2"
                 disabled={username.toLowerCase() === 'admin'}
                 required={username.toLowerCase() !== 'admin'}
              />
