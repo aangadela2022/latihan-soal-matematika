@@ -99,8 +99,7 @@ export default function LoginUI({ onLoginSuccess }) {
                 className="w-full p-4 rounded text-white" 
                 style={{background: 'rgba(0,0,0,0.5)', border: '1px solid var(--surface-border)', outline: 'none', color: 'white'}}
                 placeholder="Password 2"
-                disabled={username.toLowerCase() === 'admin'}
-                required={username.toLowerCase() !== 'admin'}
+                required
              />
           </div>
           
