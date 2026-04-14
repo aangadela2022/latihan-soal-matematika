@@ -10,6 +10,7 @@ import { fetchUsers, addUser } from './dbServices';
 import { initAI } from './aiConfig';
 import { initFirebase } from './firebase';
 
+function App() {
   const [view, setView] = useState(() => {
      const hasKey = localStorage.getItem("geminiApiKey");
      if (hasKey) {
