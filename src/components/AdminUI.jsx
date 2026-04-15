@@ -81,14 +81,19 @@ export default function AdminUI({ onBack }) {
 
         try {
           const usersToImport = data.map(row => {
-            const id = row['NIS/NIP'] || row['nip'] || row['nis'];
-            const nama = row['Nama'] || row['nama'];
-            const kelas = row['Kelas'] || row['kelas'];
-            const statusRaw = (row['Status'] || row['status'] || 'siswa').toLowerCase();
+            const getVal = (variants) => {
+              const key = Object.keys(row).find(k => variants.some(v => v.toLowerCase() === k.toLowerCase()));
+              return key ? row[key] : null;
+            };
+
+            const id = getVal(['NIS/NIP', 'nip', 'nis', 'id']);
+            const nama = getVal(['Nama', 'nama']);
+            const kelas = getVal(['Kelas', 'kelas', 'grade']);
+            const statusRaw = (getVal(['Status', 'status', 'role']) || 'siswa').toLowerCase();
             const role = statusRaw.includes('guru') ? 'guru' : 'siswa';
 
             if (id && nama) {
-              const userObj = { id, nama, kelas, role };
+              const userObj = { id, nama, kelas: kelas || 'Umum', role };
               if (role === 'siswa') {
                 userObj.level = 1;
                 userObj.xp = 0;
