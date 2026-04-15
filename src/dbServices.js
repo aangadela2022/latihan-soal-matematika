@@ -66,7 +66,7 @@ export const bulkAddUsers = async (users, onProgress) => {
         }
 
         let completed = 0;
-        for (const chunk of chunks) {
+        const promises = chunks.map(async (chunk) => {
             const batch = writeBatch(db);
             chunk.forEach(user => {
                 const userId = user.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -83,7 +83,9 @@ export const bulkAddUsers = async (users, onProgress) => {
             await batch.commit();
             completed += chunk.length;
             if (onProgress) onProgress(completed);
-        }
+        });
+
+        await Promise.all(promises);
     } catch (e) {
         console.error("Error in bulkAddUsers", e);
         throw e;
