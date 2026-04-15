@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addUser } from '../dbServices';
+import { addUser, bulkAddUsers } from '../dbServices';
 import { UserPlus, ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle } from 'lucide-react';
 import Papa from 'papaparse';
 
@@ -10,6 +10,8 @@ export default function AdminUI({ onBack }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [importStatus, setImportStatus] = useState({ loading: false, success: 0, total: 0, error: '' });
+  const [manualMode, setManualMode] = useState('single'); // 'single' or 'bulk'
+  const [bulkData, setBulkData] = useState('');
 
   const INIT_TOPICS = () => ({ "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 } });
 
@@ -18,21 +20,46 @@ export default function AdminUI({ onBack }) {
     setLoading(true);
     setMessage('');
     try {
-      const userObj = {
-         nama,
-         role,
-         kelas,
-      };
-      if (role === 'siswa') {
-         userObj.level = 1;
-         userObj.xp = 0;
-         userObj.analytics = INIT_TOPICS();
+      if (manualMode === 'single') {
+        const userObj = {
+           nama,
+           role,
+           kelas,
+        };
+        if (role === 'siswa') {
+           userObj.level = 1;
+           userObj.xp = 0;
+           userObj.analytics = INIT_TOPICS();
+        }
+        await addUser(userObj);
+        setMessage(`Berhasil menambahkan ${role} ${nama}`);
+        setNama('');
+        setKelas('');
+      } else {
+        // Bulk mode
+        const lines = bulkData.split('\n').filter(l => l.trim());
+        if (lines.length === 0) throw new Error('Data massal kosong');
+        
+        const usersToImport = lines.map(line => {
+           // Format: Nama|Kelas or just Nama
+           const parts = line.split(/[|,\t]/).map(p => p.trim());
+           const userObj = {
+              nama: parts[0],
+              role,
+              kelas: parts[1] || kelas || 'Umum',
+           };
+           if (role === 'siswa') {
+              userObj.level = 1;
+              userObj.xp = 0;
+              userObj.analytics = INIT_TOPICS();
+           }
+           return userObj;
+        });
+        
+        await bulkAddUsers(usersToImport);
+        setMessage(`Berhasil menambahkan ${usersToImport.length} ${role} secara massal`);
+        setBulkData('');
       }
-      
-      await addUser(userObj);
-      setMessage(`Berhasil menambahkan ${role} ${nama}`);
-      setNama('');
-      setKelas('');
     } catch (err) {
       setMessage(`Gagal: ${err.message}`);
     }
@@ -52,10 +79,8 @@ export default function AdminUI({ onBack }) {
         const data = results.data;
         setImportStatus(prev => ({ ...prev, total: data.length }));
 
-        let count = 0;
         try {
-          for (const row of data) {
-            // Kolom: NIS/NIP, Nama, Kelas, Status
+          const usersToImport = data.map(row => {
             const id = row['NIS/NIP'] || row['nip'] || row['nis'];
             const nama = row['Nama'] || row['nama'];
             const kelas = row['Kelas'] || row['kelas'];
@@ -69,11 +94,15 @@ export default function AdminUI({ onBack }) {
                 userObj.xp = 0;
                 userObj.analytics = INIT_TOPICS();
               }
-              await addUser(userObj);
-              count++;
-              setImportStatus(prev => ({ ...prev, success: count }));
+              return userObj;
             }
-          }
+            return null;
+          }).filter(u => u !== null);
+
+          await bulkAddUsers(usersToImport, (completed) => {
+             setImportStatus(prev => ({ ...prev, success: completed }));
+          });
+          
           setImportStatus(prev => ({ ...prev, loading: false }));
         } catch (err) {
           setImportStatus(prev => ({ ...prev, loading: false, error: 'Terjadi kesalahan saat mengunggah: ' + err.message }));
@@ -99,10 +128,11 @@ export default function AdminUI({ onBack }) {
               </div>
 
               <form onSubmit={handleAdd}>
-                 <div className="mb-4">
-                    <label className="block mb-1 text-sm text-muted">Nama Lengkap</label>
-                    <input required type="text" className="w-full p-3 rounded" style={{background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white'}} value={nama} onChange={(e)=>setNama(e.target.value)} />
+                 <div className="flex bg-black/30 p-1 rounded-lg mb-6">
+                    <button type="button" onClick={()=>setManualMode('single')} className={`flex-1 py-2 text-sm rounded ${manualMode==='single' ? 'bg-primary text-white' : 'text-muted'}`}>Satu per Satu</button>
+                    <button type="button" onClick={()=>setManualMode('bulk')} className={`flex-1 py-2 text-sm rounded ${manualMode==='bulk' ? 'bg-primary text-white' : 'text-muted'}`}>Tempel Massal</button>
                  </div>
+
                  <div className="mb-4">
                     <label className="block mb-1 text-sm text-muted">Role/Status</label>
                     <select className="w-full p-3 rounded" style={{background: 'rgba(0,0,0,0.8)', border: '1px solid var(--surface-border)', color: 'white'}} value={role} onChange={(e)=>setRole(e.target.value)}>
@@ -110,10 +140,35 @@ export default function AdminUI({ onBack }) {
                        <option value="guru">Guru</option>
                     </select>
                  </div>
-                 <div className="mb-6">
-                    <label className="block mb-1 text-sm text-muted">Kelas / Penempatan</label>
-                    <input required type="text" className="w-full p-3 rounded" style={{background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white'}} value={kelas} onChange={(e)=>setKelas(e.target.value)} />
-                 </div>
+
+                 {manualMode === 'single' ? (
+                   <>
+                     <div className="mb-4">
+                        <label className="block mb-1 text-sm text-muted">Nama Lengkap</label>
+                         <input required type="text" className="w-full p-3 rounded" style={{background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white'}} value={nama} onChange={(e)=>setNama(e.target.value)} />
+                      </div>
+                      <div className="mb-6">
+                         <label className="block mb-1 text-sm text-muted">Kelas / Penempatan</label>
+                         <input required type="text" className="w-full p-3 rounded" style={{background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white'}} value={kelas} onChange={(e)=>setKelas(e.target.value)} />
+                      </div>
+                   </>
+                 ) : (
+                   <div className="mb-6">
+                      <label className="block mb-1 text-sm text-muted">Daftar Nama (Satu per baris)</label>
+                      <p className="text-xs text-muted mb-2">Format: "Nama" atau "Nama, Kelas"</p>
+                      <textarea 
+                        className="w-full p-3 rounded h-32" 
+                        style={{background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white', fontFamily: 'monospace'}} 
+                        placeholder="Contoh:&#10;Andi Saputra&#10;Budi Santoso, 7A&#10;Citra Lestari"
+                        value={bulkData}
+                        onChange={(e)=>setBulkData(e.target.value)}
+                      />
+                      <div className="mt-4">
+                         <label className="block mb-1 text-sm text-muted">Kelas Default (Jika tidak diisi di atas)</label>
+                         <input type="text" className="w-full p-3 rounded" style={{background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white'}} value={kelas} onChange={(e)=>setKelas(e.target.value)} />
+                      </div>
+                   </div>
+                 )}
 
                  {message && <div className={`badge ${message.startsWith('Gagal') ? 'badge-danger' : 'badge-success'} mb-4 p-3 w-full block text-center`}>{message}</div>}
 

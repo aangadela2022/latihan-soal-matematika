@@ -9,7 +9,8 @@ import {
     where, 
     setDoc, 
     getDoc,
-    arrayUnion
+    arrayUnion,
+    writeBatch
 } from "firebase/firestore";
 
 export const fetchUsers = async () => {
@@ -53,6 +54,38 @@ export const addUser = async (userObj) => {
         return { id: userId, ...dataToSave };
     } catch (e) {
         console.error("Error adding user to Firestore", e);
+        throw e;
+    }
+};
+
+export const bulkAddUsers = async (users, onProgress) => {
+    try {
+        const chunks = [];
+        for (let i = 0; i < users.length; i += 500) {
+            chunks.push(users.slice(i, i + 500));
+        }
+
+        let completed = 0;
+        for (const chunk of chunks) {
+            const batch = writeBatch(db);
+            chunk.forEach(user => {
+                const userId = user.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                const userRef = doc(db, "users", userId);
+                const dataToSave = {
+                    ...user,
+                    xp: user.xp || 0,
+                    level: user.level || 1,
+                    analytics: user.analytics || {},
+                    history: user.history || []
+                };
+                batch.set(userRef, dataToSave);
+            });
+            await batch.commit();
+            completed += chunk.length;
+            if (onProgress) onProgress(completed);
+        }
+    } catch (e) {
+        console.error("Error in bulkAddUsers", e);
         throw e;
     }
 };
