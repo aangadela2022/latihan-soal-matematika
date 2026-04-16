@@ -59,41 +59,49 @@ export const addUser = async (userObj) => {
 };
 
 export const bulkAddUsers = async (users, onProgress) => {
-    try {
-        // Batch size 100: setiap batch diselesaikan dulu sebelum lanjut ke berikutnya
-        // Sehingga progress counter naik bertahap: 100 → 200 → 300 ... dst
-        const BATCH_SIZE = 100;
-        const chunks = [];
-        for (let i = 0; i < users.length; i += BATCH_SIZE) {
-            chunks.push(users.slice(i, i + BATCH_SIZE));
-        }
+    // Batch size 200: cukup besar agar efisien, cukup kecil agar progress keliatan
+    const BATCH_SIZE = 200;
+    const chunks = [];
+    for (let i = 0; i < users.length; i += BATCH_SIZE) {
+        chunks.push(users.slice(i, i + BATCH_SIZE));
+    }
 
-        let completed = 0;
-        // Sequential: tunggu tiap batch selesai → progress naik → lanjut batch berikutnya
-        for (let chunkIdx = 0; chunkIdx < chunks.length; chunkIdx++) {
-            const chunk = chunks[chunkIdx];
-            const batch = writeBatch(db);
-            chunk.forEach((user, idx) => {
-                const userId = user.id || `${Date.now()}-${completed + idx}-${Math.random().toString(36).substr(2, 6)}`;
-                const userRef = doc(db, "users", userId);
-                // Hanya simpan data inti — analytics/history dibuat saat pertama login
-                const dataToSave = {
-                    nama: user.nama,
-                    role: user.role,
-                    kelas: user.kelas || 'Umum',
-                    xp: 0,
-                    level: 1,
-                };
-                if (user.id) dataToSave.id = user.id;
-                batch.set(userRef, dataToSave);
-            });
-            await batch.commit();
-            completed += chunk.length;
-            if (onProgress) onProgress(completed);
-        }
-    } catch (e) {
-        console.error("Error in bulkAddUsers", e);
-        throw e;
+    // Siapkan semua batch terlebih dahulu (proses client-side, sangat cepat)
+    let completed = 0;
+    const commitPromises = chunks.map((chunk, chunkIdx) => {
+        const batch = writeBatch(db);
+        const startIdx = chunkIdx * BATCH_SIZE;
+        chunk.forEach((user, idx) => {
+            const userId = user.id || `${Date.now()}-${startIdx + idx}-${Math.random().toString(36).substr(2, 6)}`;
+            const userRef = doc(db, "users", userId);
+            // Hanya simpan data inti — analytics/history dibuat saat pertama login
+            const dataToSave = {
+                nama: user.nama,
+                role: user.role,
+                kelas: user.kelas || 'Umum',
+                xp: 0,
+                level: 1,
+            };
+            if (user.id) dataToSave.id = user.id;
+            batch.set(userRef, dataToSave);
+        });
+        return { batch, size: chunk.length };
+    });
+
+    // OPTIMISTIC UI: Update progress sebelum nunggu konfirmasi server
+    // Ini membuat tampilan langsung update tanpa nunggu latensi jaringan ke Firebase
+    if (onProgress) onProgress(users.length);
+
+    // Kirim semua batch ke Firebase secara paralel di background
+    const errors = [];
+    await Promise.all(
+        commitPromises.map(({ batch }) =>
+            batch.commit().catch(e => { errors.push(e.message); })
+        )
+    );
+
+    if (errors.length > 0) {
+        throw new Error(`Gagal menyimpan ${errors.length} batch ke server: ${errors[0]}`);
     }
 };
 

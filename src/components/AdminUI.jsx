@@ -9,7 +9,7 @@ export default function AdminUI({ onBack }) {
   const [kelas, setKelas] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [importStatus, setImportStatus] = useState({ loading: false, success: 0, total: 0, error: '' });
+  const [importStatus, setImportStatus] = useState({ loading: false, syncing: false, success: 0, total: 0, error: '' });
   const [manualMode, setManualMode] = useState('single'); // 'single' or 'bulk'
   const [bulkData, setBulkData] = useState('');
 
@@ -77,7 +77,7 @@ export default function AdminUI({ onBack }) {
       skipEmptyLines: true,
       complete: async (results) => {
         const data = results.data;
-        setImportStatus(prev => ({ ...prev, total: data.length }));
+        setImportStatus({ loading: true, syncing: false, success: 0, total: data.length, error: '' });
 
         try {
           const usersToImport = data.map(row => {
@@ -105,16 +105,18 @@ export default function AdminUI({ onBack }) {
           }).filter(u => u !== null);
 
           await bulkAddUsers(usersToImport, (completed) => {
-             setImportStatus(prev => ({ ...prev, success: completed }));
+             // Optimistic: progress langsung penuh, lanjut sinkronisasi ke server
+             setImportStatus(prev => ({ ...prev, success: completed, syncing: true }));
           });
           
-          setImportStatus(prev => ({ ...prev, loading: false }));
+          // Server konfirmasi selesai
+          setImportStatus(prev => ({ ...prev, loading: false, syncing: false }));
         } catch (err) {
-          setImportStatus(prev => ({ ...prev, loading: false, error: 'Terjadi kesalahan saat mengunggah: ' + err.message }));
+          setImportStatus(prev => ({ ...prev, loading: false, syncing: false, error: 'Terjadi kesalahan: ' + err.message }));
         }
       },
       error: (err) => {
-        setImportStatus({ loading: false, success: 0, total: 0, error: 'Gagal membaca file: ' + err.message });
+        setImportStatus({ loading: false, syncing: false, success: 0, total: 0, error: 'Gagal membaca file: ' + err.message });
       }
     });
   };
@@ -211,17 +213,38 @@ export default function AdminUI({ onBack }) {
               </div>
 
               {importStatus.total > 0 && (
-                 <div className="mt-6 p-4 rounded" style={{background: 'rgba(255,255,255,0.05)', borderLeft: '4px solid var(--primary)'}}>
-                    <div className="flex items-center gap-3">
-                       {importStatus.loading ? (
-                          <div className="animate-spin" style={{width: '16px', height: '16px', border: '2px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%'}}></div>
-                       ) : (
+                 <div className="mt-6 p-4 rounded" style={{background: 'rgba(255,255,255,0.05)', borderLeft: `4px solid ${!importStatus.loading && !importStatus.syncing ? 'var(--success)' : 'var(--primary)'}`}}>
+                    <div className="flex items-center gap-3 mb-3">
+                       {(!importStatus.loading && !importStatus.syncing) ? (
                           <CheckCircle size={20} color="var(--success)" />
+                       ) : (
+                          <div className="animate-spin" style={{width: '16px', height: '16px', border: '2px solid var(--primary)', borderTopColor: 'transparent', borderRadius: '50%', flexShrink: 0}}></div>
                        )}
-                       <p className="text-sm">
-                          {importStatus.loading ? `Sedang mengimpor data... (${importStatus.success}/${importStatus.total})` : `Berhasil mengimpor ${importStatus.success} dari ${importStatus.total} data.`}
+                       <p className="text-sm" style={{fontWeight: 600}}>
+                          {importStatus.syncing
+                            ? `✅ ${importStatus.success} data divalidasi — menyimpan ke server...`
+                            : importStatus.loading
+                            ? `Membaca file CSV...`
+                            : `✅ Berhasil tersimpan ${importStatus.success} dari ${importStatus.total} data ke server!`
+                          }
                        </p>
                     </div>
+                    {/* Progress bar */}
+                    <div style={{background: 'rgba(255,255,255,0.1)', borderRadius: '99px', height: '6px', overflow: 'hidden'}}>
+                       <div style={{
+                          height: '100%',
+                          width: importStatus.success > 0 ? '100%' : '0%',
+                          background: (!importStatus.loading && !importStatus.syncing) ? 'var(--success)' : 'var(--primary)',
+                          borderRadius: '99px',
+                          transition: 'width 0.4s ease',
+                          animation: importStatus.syncing ? 'pulse 1.5s infinite' : 'none'
+                       }}></div>
+                    </div>
+                    {importStatus.syncing && (
+                       <p className="text-xs mt-2" style={{color: 'var(--text-muted)'}}>
+                          Data sudah diproses secara lokal, sedang disinkronkan ke cloud Firebase...
+                       </p>
+                    )}
                  </div>
               )}
 
