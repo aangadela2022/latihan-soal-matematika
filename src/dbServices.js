@@ -60,16 +60,20 @@ export const addUser = async (userObj) => {
 
 export const bulkAddUsers = async (users, onProgress) => {
     try {
+        // Pisah ke chunks maks 500 (limit Firestore writeBatch)
+        const BATCH_SIZE = 500;
         const chunks = [];
-        for (let i = 0; i < users.length; i += 500) {
-            chunks.push(users.slice(i, i + 500));
+        for (let i = 0; i < users.length; i += BATCH_SIZE) {
+            chunks.push(users.slice(i, i + BATCH_SIZE));
         }
 
         let completed = 0;
-        const promises = chunks.map(async (chunk) => {
+        // Proses sekuensial (satu per satu) agar tidak kena rate limiting Firestore
+        for (const chunk of chunks) {
             const batch = writeBatch(db);
-            chunk.forEach(user => {
-                const userId = user.id || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            chunk.forEach((user, idx) => {
+                // Gunakan index unik agar ID tidak collision
+                const userId = user.id || `${Date.now()}-${completed + idx}-${Math.random().toString(36).substr(2, 6)}`;
                 const userRef = doc(db, "users", userId);
                 const dataToSave = {
                     ...user,
@@ -83,9 +87,7 @@ export const bulkAddUsers = async (users, onProgress) => {
             await batch.commit();
             completed += chunk.length;
             if (onProgress) onProgress(completed);
-        });
-
-        await Promise.all(promises);
+        }
     } catch (e) {
         console.error("Error in bulkAddUsers", e);
         throw e;
