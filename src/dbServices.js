@@ -68,26 +68,28 @@ export const bulkAddUsers = async (users, onProgress) => {
         }
 
         let completed = 0;
-        // Proses sekuensial (satu per satu) agar tidak kena rate limiting Firestore
-        for (const chunk of chunks) {
+        // Proses paralel — semua batch dikirim bersamaan, jauh lebih cepat
+        await Promise.all(chunks.map(async (chunk) => {
             const batch = writeBatch(db);
             chunk.forEach((user, idx) => {
-                // Gunakan index unik agar ID tidak collision
-                const userId = user.id || `${Date.now()}-${completed + idx}-${Math.random().toString(36).substr(2, 6)}`;
+                const userId = user.id || `${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 6)}`;
                 const userRef = doc(db, "users", userId);
+                // Hanya simpan data inti saat import — analytics/history dibuat saat pertama login
+                // Ini mengurangi ukuran payload per dokumen secara signifikan
                 const dataToSave = {
-                    ...user,
-                    xp: user.xp || 0,
-                    level: user.level || 1,
-                    analytics: user.analytics || {},
-                    history: user.history || []
+                    nama: user.nama,
+                    role: user.role,
+                    kelas: user.kelas || 'Umum',
+                    xp: 0,
+                    level: 1,
                 };
+                if (user.id) dataToSave.id = user.id;
                 batch.set(userRef, dataToSave);
             });
             await batch.commit();
             completed += chunk.length;
             if (onProgress) onProgress(completed);
-        }
+        }));
     } catch (e) {
         console.error("Error in bulkAddUsers", e);
         throw e;
