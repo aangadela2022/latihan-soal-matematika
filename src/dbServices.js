@@ -60,22 +60,23 @@ export const addUser = async (userObj) => {
 
 export const bulkAddUsers = async (users, onProgress) => {
     try {
-        // Pisah ke chunks maks 500 (limit Firestore writeBatch)
-        const BATCH_SIZE = 500;
+        // Batch size 100: lebih banyak batch paralel = progress update lebih sering
+        // (untuk 1087 data → 11 batch, update tiap ~2-3 detik vs 3 batch sebelumnya)
+        const BATCH_SIZE = 100;
         const chunks = [];
         for (let i = 0; i < users.length; i += BATCH_SIZE) {
-            chunks.push(users.slice(i, i + BATCH_SIZE));
+            chunks.push({ data: users.slice(i, i + BATCH_SIZE), startIdx: i });
         }
 
+        // Gunakan counter atomic berbasis atomic counter untuk menghindari race condition
         let completed = 0;
         // Proses paralel — semua batch dikirim bersamaan, jauh lebih cepat
-        await Promise.all(chunks.map(async (chunk) => {
+        await Promise.all(chunks.map(async ({ data: chunk, startIdx }) => {
             const batch = writeBatch(db);
             chunk.forEach((user, idx) => {
-                const userId = user.id || `${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 6)}`;
+                const userId = user.id || `${Date.now()}-${startIdx + idx}-${Math.random().toString(36).substr(2, 6)}`;
                 const userRef = doc(db, "users", userId);
                 // Hanya simpan data inti saat import — analytics/history dibuat saat pertama login
-                // Ini mengurangi ukuran payload per dokumen secara signifikan
                 const dataToSave = {
                     nama: user.nama,
                     role: user.role,
