@@ -92,11 +92,18 @@ export const bulkAddUsers = async (users, onProgress) => {
     // Ini membuat tampilan langsung update tanpa nunggu latensi jaringan ke Firebase
     if (onProgress) onProgress(users.length);
 
-    // Kirim semua batch ke Firebase secara paralel di background
+    // Kirim semua batch ke Firebase secara paralel di background dengan timeout
     const errors = [];
+    const TIMEOUT_MS = 15000;
+    
+    const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Timeout: Gagal terhubung ke database. Cek apakah Firestore sudah diaktifkan di Firebase Console, atau cek koneksi internet Anda.")), TIMEOUT_MS)
+    );
+
     await Promise.all(
         commitPromises.map(({ batch }) =>
-            batch.commit().catch(e => { errors.push(e.message); })
+            Promise.race([batch.commit(), timeoutPromise])
+                .catch(e => { errors.push(e.message); })
         )
     );
 
