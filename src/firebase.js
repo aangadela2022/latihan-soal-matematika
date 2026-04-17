@@ -5,13 +5,13 @@ export let firebaseApp = null;
 export let db = null;
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyA-FGwJ-XaVGAve7Mhpz8aMtemZEEVhOEE",
+  authDomain: "latihan-soal-matematika.firebaseapp.com",
+  projectId: "latihan-soal-matematika",
+  storageBucket: "latihan-soal-matematika.firebasestorage.app",
+  messagingSenderId: "684723272865",
+  appId: "1:684723272865:web:f0c254f795075b675c04e0",
+  measurementId: "G-H874VNBW7P"
 };
 
 export const initFirebase = () => {
