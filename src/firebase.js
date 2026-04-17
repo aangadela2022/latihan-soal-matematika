@@ -16,6 +16,9 @@ const firebaseConfig = {
 
 export const initFirebase = () => {
     try {
+        if (!firebaseConfig.apiKey) {
+            throw new Error("Konfigurasi Firebase (API Key) tidak ditemukan. Jika Anda baru membuat file .env, pastikan untuk me-restart server Vite (npm run dev).");
+        }
         if (!getApps().length) {
             firebaseApp = initializeApp(firebaseConfig);
         } else {
