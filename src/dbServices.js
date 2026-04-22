@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 
 export const fetchUsers = async () => {
     try {
+        if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi.");
         const { data, error } = await supabase.from('users').select('*');
         if (error) throw error;
         return data || [];
@@ -13,6 +14,7 @@ export const fetchUsers = async () => {
 
 export const findUserByName = async (nama) => {
     try {
+        if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi.");
         const { data, error } = await supabase
             .from('users')
             .select('*')
@@ -28,6 +30,7 @@ export const findUserByName = async (nama) => {
 
 export const addUser = async (userObj) => {
     try {
+        if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi. Pastikan VITE_SUPABASE_URL ada di .env dan restart server.");
         const userId = userObj.id || Date.now().toString();
         const dataToSave = {
             id: userId,
@@ -56,6 +59,10 @@ export const addUser = async (userObj) => {
 
 export const bulkAddUsers = async (users, onProgress) => {
     try {
+        if (!supabase) {
+            throw new Error("Koneksi Supabase belum terinisialisasi. Jika Anda baru saja menambahkan file .env, mohon restart server Vite Anda (Ctrl+C lalu npm run dev). Atau pastikan VITE_SUPABASE_URL telah diatur.");
+        }
+
         const dataToInsert = users.map((user, idx) => ({
             id: user.id || `${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 6)}`,
             nama: user.nama,
@@ -97,6 +104,7 @@ export const bulkAddUsers = async (users, onProgress) => {
 
 export const updateUserStats = async (userId, xp, analytics, level) => {
     try {
+        if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi.");
         const { error } = await supabase
             .from('users')
             .update({ xp, analytics, level })
@@ -109,6 +117,7 @@ export const updateUserStats = async (userId, xp, analytics, level) => {
 
 export const addSessionHistory = async (userId, sessionData) => {
     try {
+        if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi.");
         // Ambil history lama lalu append
         const { data: userData, error: fetchErr } = await supabase
             .from('users')
