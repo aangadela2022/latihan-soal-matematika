@@ -4,6 +4,7 @@ import { UserPlus, ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle,
 import Papa from 'papaparse';
 
 const CLASS_OPTIONS = [
+  "Guru",
   "X NKPI 1", "X NKPI 2", "X APHP 1", "X APHP 2", "X TKJ 1", "X TKJ 2", "X TKJ 3", "X RPL 1", "X RPL 2", "X TAB 1", "X TAB 2", "X TAB 3", "X KULINER 1", "X KULINER 2", "X KULINER 3", "X APPL", "X TP 1", "X TP 2",
   "XI NKPI 1", "XI NKPI 2", "XI APHP 1", "XI APHP 2", "XI TKJ 1", "XI TKJ 2", "XI TKJ 3", "XI RPL 1", "XI RPL 2", "XI TAB 1", "XI TAB 2", "XI TAB 3", "XI KULINER 1", "XI KULINER 2", "XI KULINER 3", "XI APPL", "XI TP 1", "XI TP 2"
 ];
@@ -435,9 +436,11 @@ export default function AdminUI({ onBack }) {
                      <tbody>
                         {allUsers.filter(u => u.nama.toLowerCase().includes(searchQuery.toLowerCase()) || String(u.id).toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 50).map(user => (
                            <tr key={user.id} className="border-b border-gray-800 hover:bg-black/20">
-                              {editingUser?.id === user.id ? (
+                              {editingUser?.originalId === user.id ? (
                                  <>
-                                    <td className="px-4 py-2 text-muted">{user.id}</td>
+                                    <td className="px-4 py-2">
+                                       <input className="p-1.5 rounded bg-black/50 border border-gray-600 text-white w-full" value={editingUser.id} onChange={(e) => setEditingUser({...editingUser, id: e.target.value})} />
+                                    </td>
                                     <td className="px-4 py-2">
                                        <input className="p-1.5 rounded bg-black/50 border border-gray-600 text-white w-full" value={editingUser.nama} onChange={(e) => setEditingUser({...editingUser, nama: e.target.value})} />
                                     </td>
@@ -455,8 +458,8 @@ export default function AdminUI({ onBack }) {
                                     <td className="px-4 py-2 text-center min-w-[150px]">
                                        <button onClick={async () => {
                                           try {
-                                             await updateUserProfile(editingUser.id, { nama: editingUser.nama, kelas: editingUser.kelas, role: editingUser.role });
-                                             setAllUsers(allUsers.map(u => u.id === editingUser.id ? editingUser : u));
+                                             await updateUserProfile(editingUser.originalId, { id: editingUser.id, nama: editingUser.nama, kelas: editingUser.kelas, role: editingUser.role });
+                                             setAllUsers(allUsers.map(u => u.id === editingUser.originalId ? { ...editingUser, originalId: undefined } : u));
                                              setEditingUser(null);
                                           } catch (e) {
                                              alert("Gagal menyimpan: " + e.message);
@@ -472,7 +475,7 @@ export default function AdminUI({ onBack }) {
                                     <td className="px-4 py-3">{user.kelas}</td>
                                     <td className="px-4 py-3 capitalize">{user.role}</td>
                                     <td className="px-4 py-3 text-center">
-                                       <button onClick={() => setEditingUser({...user})} className="btn btn-outline px-3 py-1 text-xs hover:bg-primary/20">Edit</button>
+                                       <button onClick={() => setEditingUser({...user, originalId: user.id})} className="btn btn-outline px-3 py-1 text-xs hover:bg-primary/20">Edit</button>
                                     </td>
                                  </>
                               )}
