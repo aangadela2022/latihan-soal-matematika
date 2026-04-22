@@ -18,10 +18,10 @@ export const findUserByName = async (nama) => {
         const { data, error } = await supabase
             .from('users')
             .select('*')
-            .eq('nama', nama)
-            .single();
-        if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
-        return data || null;
+            .ilike('nama', nama)
+            .limit(1);
+        if (error) throw error; 
+        return data && data.length > 0 ? data[0] : null;
     } catch (e) {
         console.error("Error finding user:", e);
         return null;
