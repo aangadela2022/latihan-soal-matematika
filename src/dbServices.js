@@ -163,3 +163,18 @@ export const deleteAllUsers = async () => {
         throw e;
     }
 };
+
+export const updateUserProfile = async (userId, dataBaru) => {
+    try {
+        if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi.");
+        const { error } = await supabase
+            .from('users')
+            .update(dataBaru)
+            .eq('id', userId);
+        if (error) throw error;
+        return true;
+    } catch (e) {
+        console.error("Error updating user profile:", e);
+        throw e;
+    }
+};

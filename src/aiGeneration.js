@@ -15,14 +15,15 @@ export const generateQuestions = async (topic, level) => {
         // Gunakan model generasi (disarankan gemini-1.5-flash untuk respon cepat JSON)
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const prompt = `Anda adalah seorang ahli pembuat soal matematika yang brilian.
+const prompt = `Anda adalah seorang ahli pembuat soal matematika yang brilian.
 Sajikan persis 10 soal pilihan ganda matematika untuk topik "${topic}".
 Panduan WAJIB:
 1. Seluruh soal harus 100% berkonteks kehidupan sehari-hari yang realistis.
-2. Tingkat kognitif soal divariasikan antara C2 (Memahami), C3 (Mengaplikasikan), dan C4 (Menganalisis).
-3. Target kesulitan siswa adalah tingkat ${levelStr}.
-4. Setiap soal punya 4 opsi jawaban (indeks 0, 1, 2, 3), buatlah distraktor yang logis.
-5. Berikan pembahasan detail dan rasional, jangan hanya memberi hasil akhir.
+2. WAJIB: Konteks dari ke-10 soal HARUS SANGAT BERVARIASI dan TIDAK BERULANG. Pastikan masing-masing soal mengambil tema yang berbeda (Misal: 1 soal tentang Olahraga, 1 soal tentang Belanja/Pasar, 1 tentang Memasak, 1 tentang Perjalanan/Transportasi, 1 tentang Alam/Lingkungan, 1 tentang Teknologi, 1 tentang Konstruksi, dll). Jangan gunakan tema yang sama berulang kali.
+3. Tingkat kognitif soal divariasikan antara C2 (Memahami), C3 (Mengaplikasikan), dan C4 (Menganalisis).
+4. Target kesulitan siswa adalah tingkat ${levelStr}.
+5. Setiap soal punya 4 opsi jawaban (indeks 0, 1, 2, 3), buatlah distraktor yang logis.
+6. Berikan pembahasan detail dan rasional, jangan hanya memberi hasil akhir.
 6. Kembalikan HANYA berwujud array JSON murni tanpa awalan/akhiran text maupun markdown "json". Struktur JSON:
 [
   {

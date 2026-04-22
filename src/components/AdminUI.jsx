@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { addUser, bulkAddUsers, fetchUsers, deleteAllUsers } from '../dbServices';
-import { UserPlus, ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Download, Trash2, Database } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { addUser, bulkAddUsers, fetchUsers, deleteAllUsers, updateUserProfile } from '../dbServices';
+import { UserPlus, ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Download, Trash2, Database, Search, Edit2 } from 'lucide-react';
 import Papa from 'papaparse';
 
 const CLASS_OPTIONS = [
@@ -19,8 +19,26 @@ export default function AdminUI({ onBack }) {
   const [manualMode, setManualMode] = useState('single'); // 'single' or 'bulk'
   const [bulkData, setBulkData] = useState('');
   const [previewData, setPreviewData] = useState(null);
+  
+  // States for Edit Data
+  const [allUsers, setAllUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingUser, setEditingUser] = useState(null);
 
   const INIT_TOPICS = () => ({ "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 } });
+
+  const loadAllUsers = async () => {
+     try {
+        const users = await fetchUsers();
+        setAllUsers(users);
+     } catch (err) {
+        console.error(err);
+     }
+  };
+
+  useEffect(() => {
+     loadAllUsers();
+  }, []);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -378,6 +396,100 @@ export default function AdminUI({ onBack }) {
                      <Trash2 size={32} />
                      <span>Reset Seluruh Data</span>
                   </button>
+               </div>
+            </div>
+
+            {/* Pencarian dan Edit Data */}
+            <div className="glass-panel md:col-span-2" style={{height: 'fit-content', marginBottom: '4rem'}}>
+               <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                     <Edit2 size={24} color="var(--primary)" />
+                     <h2 style={{fontSize: '1.2rem', fontWeight: 600}}>Edit Data Pengguna</h2>
+                  </div>
+                  <button onClick={loadAllUsers} className="btn btn-outline px-3 py-1 text-xs">Muat Ulang Data</button>
+               </div>
+               
+               <div className="relative mb-6">
+                  <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+                  <input 
+                     type="text" 
+                     className="w-full p-3 pl-10 rounded" 
+                     style={{background: 'rgba(0,0,0,0.8)', border: '1px solid var(--surface-border)', color: 'white'}} 
+                     placeholder="Cari berdasarkan NIS atau Nama..." 
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+               </div>
+
+               <div className="overflow-x-auto rounded" style={{maxHeight: '400px', border: '1px solid var(--surface-border)'}}>
+                  <table className="w-full text-sm text-left text-gray-300">
+                     <thead className="text-xs uppercase bg-black/50 sticky top-0 z-10">
+                        <tr>
+                           <th className="px-4 py-3">NIS/NIP</th>
+                           <th className="px-4 py-3">Nama Lengkap</th>
+                           <th className="px-4 py-3">Kelas</th>
+                           <th className="px-4 py-3">Role</th>
+                           <th className="px-4 py-3 text-center">Aksi</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {allUsers.filter(u => u.nama.toLowerCase().includes(searchQuery.toLowerCase()) || String(u.id).toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 50).map(user => (
+                           <tr key={user.id} className="border-b border-gray-800 hover:bg-black/20">
+                              {editingUser?.id === user.id ? (
+                                 <>
+                                    <td className="px-4 py-2 text-muted">{user.id}</td>
+                                    <td className="px-4 py-2">
+                                       <input className="p-1.5 rounded bg-black/50 border border-gray-600 text-white w-full" value={editingUser.nama} onChange={(e) => setEditingUser({...editingUser, nama: e.target.value})} />
+                                    </td>
+                                    <td className="px-4 py-2">
+                                       <select className="p-1.5 rounded bg-black/50 border border-gray-600 text-white" value={editingUser.kelas} onChange={(e) => setEditingUser({...editingUser, kelas: e.target.value})}>
+                                          {CLASS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                       </select>
+                                    </td>
+                                    <td className="px-4 py-2">
+                                       <select className="p-1.5 rounded bg-black/50 border border-gray-600 text-white" value={editingUser.role} onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}>
+                                          <option value="siswa">siswa</option>
+                                          <option value="guru">guru</option>
+                                       </select>
+                                    </td>
+                                    <td className="px-4 py-2 text-center min-w-[150px]">
+                                       <button onClick={async () => {
+                                          try {
+                                             await updateUserProfile(editingUser.id, { nama: editingUser.nama, kelas: editingUser.kelas, role: editingUser.role });
+                                             setAllUsers(allUsers.map(u => u.id === editingUser.id ? editingUser : u));
+                                             setEditingUser(null);
+                                          } catch (e) {
+                                             alert("Gagal menyimpan: " + e.message);
+                                          }
+                                       }} className="btn btn-primary px-3 py-1 text-xs">Simpan</button>
+                                       <button onClick={() => setEditingUser(null)} className="btn btn-outline px-3 py-1 text-xs ml-2">Batal</button>
+                                    </td>
+                                 </>
+                              ) : (
+                                 <>
+                                    <td className="px-4 py-3">{user.id}</td>
+                                    <td className="px-4 py-3 font-medium text-white">{user.nama}</td>
+                                    <td className="px-4 py-3">{user.kelas}</td>
+                                    <td className="px-4 py-3 capitalize">{user.role}</td>
+                                    <td className="px-4 py-3 text-center">
+                                       <button onClick={() => setEditingUser({...user})} className="btn btn-outline px-3 py-1 text-xs hover:bg-primary/20">Edit</button>
+                                    </td>
+                                 </>
+                              )}
+                           </tr>
+                        ))}
+                        {allUsers.length === 0 && (
+                           <tr>
+                              <td colSpan="5" className="text-center py-8 text-muted">Belum ada data atau data sedang dimuat...</td>
+                           </tr>
+                        )}
+                        {allUsers.length > 0 && allUsers.filter(u => u.nama.toLowerCase().includes(searchQuery.toLowerCase()) || String(u.id).toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                           <tr>
+                              <td colSpan="5" className="text-center py-8 text-muted">Tidak ditemukan data dengan pencarian "{searchQuery}"</td>
+                           </tr>
+                        )}
+                     </tbody>
+                  </table>
                </div>
             </div>
 
