@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { saveFirebaseConfig } from '../firebase';
+import { saveSupabaseConfig } from '../supabase';
 import { saveGeminiKey } from '../aiConfig';
 import { Key, CheckCircle } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export default function ConfigUI({ onConfigComplete }) {
 
     try {
        // Firebase is hardcoded now, we just call saveFirebaseConfig to trigger init
-       const fbSuccess = saveFirebaseConfig();
+       const fbSuccess = saveSupabaseConfig();
        const genSuccess = saveGeminiKey(gkConfig);
 
        if (fbSuccess && genSuccess) {
@@ -37,7 +37,7 @@ export default function ConfigUI({ onConfigComplete }) {
           </div>
         </div>
         <h1 className="title text-center" style={{fontSize: '2rem'}}>Setup Workspace (Lokal)</h1>
-        <p className="subtitle text-center" style={{marginBottom: '2rem'}}>Firebase sudah disiapkan. Silakan masukkan Gemini API Key Anda untuk melanjutkan.</p>
+        <p className="subtitle text-center" style={{marginBottom: '2rem'}}>Supabase sudah disiapkan. Silakan masukkan Gemini API Key Anda untuk melanjutkan.</p>
         
         {error && <div className="badge badge-danger mb-4 w-full p-4">{error}</div>}
 

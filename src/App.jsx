@@ -7,14 +7,14 @@ import PracticeUI from './components/PracticeUI';
 import ConfigUI from './components/ConfigUI';
 
 import { initAI } from './aiConfig';
-import { initFirebase } from './firebase';
+import { initSupabase } from './supabase';
 
 function App() {
   const [view, setView] = useState(() => {
      const hasKey = localStorage.getItem("geminiApiKey");
      if (hasKey) {
         initAI();
-        initFirebase();
+        initSupabase();
         return 'login';
      }
      return 'config';
@@ -39,7 +39,7 @@ function App() {
 
   if (view === 'config') return <ConfigUI onConfigComplete={() => {
     initAI();
-    initFirebase();
+    initSupabase();
     setView('login');
   }} />;
 
