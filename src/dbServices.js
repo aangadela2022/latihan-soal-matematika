@@ -74,13 +74,20 @@ export const bulkAddUsers = async (users, onProgress) => {
             history: [],
         }));
 
+        // Deduplicate data by ID (keep the last occurrence) to prevent "ON CONFLICT DO UPDATE command cannot affect row a second time"
+        const uniqueDataMap = new Map();
+        for (const item of dataToInsert) {
+            uniqueDataMap.set(item.id, item);
+        }
+        const uniqueDataToInsert = Array.from(uniqueDataMap.values());
+
         // Optimistic UI: langsung update progress
-        if (onProgress) onProgress(users.length);
+        if (onProgress) onProgress(uniqueDataToInsert.length);
 
         const CHUNK_SIZE = 500;
         const chunks = [];
-        for (let i = 0; i < dataToInsert.length; i += CHUNK_SIZE) {
-            chunks.push(dataToInsert.slice(i, i + CHUNK_SIZE));
+        for (let i = 0; i < uniqueDataToInsert.length; i += CHUNK_SIZE) {
+            chunks.push(uniqueDataToInsert.slice(i, i + CHUNK_SIZE));
         }
 
         const errors = [];
