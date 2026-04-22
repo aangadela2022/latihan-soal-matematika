@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUsers } from '../dbServices';
-import { PieChart, LogOut, RefreshCcw, Users, User, BarChart2, TrendingUp, Target } from 'lucide-react';
+import { PieChart, LogOut, RefreshCcw, Users, User, BarChart2, TrendingUp, Target, Download, FileText } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
   LineChart, Line, ScatterChart, Scatter, Cell, AreaChart, Area 
@@ -105,6 +105,28 @@ export default function TeacherUI({ user, onLogout }) {
 
   const studentData = getStudentStats();
 
+  // --- EXPORT CSV (REKAP KELAS) ---
+  const handleExportClassData = () => {
+     if (filteredStudentsByClass.length === 0) return;
+     
+     let csvContent = "data:text/csv;charset=utf-8,";
+     csvContent += "NIS/NIP,Nama Lengkap,Kelas,Rata-rata Keseluruhan,Total Sesi\n";
+     
+     filteredStudentsByClass.forEach(s => {
+        const history = s.history || [];
+        const avg = history.length > 0 ? Math.round(history.reduce((acc, sess) => acc + (sess.jumlahBenar / sess.totalSoal * 100), 0) / history.length) : 0;
+        csvContent += `${s.id},"${s.nama}",${s.kelas},${avg},${history.length}\n`;
+     });
+     
+     const encodedUri = encodeURI(csvContent);
+     const link = document.createElement("a");
+     link.setAttribute("href", encodedUri);
+     link.setAttribute("download", `Rekap_Nilai_Kelas_${selectedClass}.csv`);
+     document.body.appendChild(link);
+     link.click();
+     document.body.removeChild(link);
+  };
+
   return (
     <div className="container animate-fade-in" style={{maxWidth: '1200px', margin: '1rem auto', paddingBottom: '4rem'}}>
        <header className="flex justify-between items-center mb-6 glass-panel" style={{padding: '1rem 2rem'}}>
@@ -120,18 +142,24 @@ export default function TeacherUI({ user, onLogout }) {
        </header>
 
        {/* Navigation Tabs */}
-       <div className="flex gap-4 mb-6">
+       <div className="flex gap-4 mb-6 overflow-x-auto pb-2">
           <button 
-            className={`btn flex-1 flex items-center justify-center gap-2 ${view === 'class' ? 'btn-primary' : 'btn-outline'}`}
+            className={`btn whitespace-nowrap flex items-center justify-center gap-2 ${view === 'class' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setView('class')}
           >
             <Users size={18} /> Monitoring Kelas
           </button>
           <button 
-            className={`btn flex-1 flex items-center justify-center gap-2 ${view === 'student' ? 'btn-primary' : 'btn-outline'}`}
+            className={`btn whitespace-nowrap flex items-center justify-center gap-2 ${view === 'student' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setView('student')}
           >
             <User size={18} /> Monitoring Siswa
+          </button>
+          <button 
+            className={`btn whitespace-nowrap flex items-center justify-center gap-2 ${view === 'recap' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setView('recap')}
+          >
+            <FileText size={18} /> Rekap Nilai
           </button>
        </div>
 
@@ -329,6 +357,69 @@ export default function TeacherUI({ user, onLogout }) {
                  )}
               </div>
            )}
+
+            {/* VIEW: REKAP NILAI SISWA */}
+            {view === 'recap' && (
+               <div className="flex flex-col gap-6">
+                  <div className="glass-panel flex flex-col md:flex-row md:items-center justify-between gap-4">
+                     <div>
+                        <h3 style={{fontSize: '1.2rem', marginBottom: '0.2rem'}}>Rekap Nilai Siswa</h3>
+                        <p className="text-sm text-muted">Melihat dan mengunduh rekap nilai rata-rata siswa per kelas</p>
+                     </div>
+                     <div className="flex flex-col md:flex-row gap-4">
+                        <select 
+                          className="p-3 rounded bg-black border border-surface-border text-white min-w-[200px]"
+                          value={selectedClass} 
+                          onChange={(e) => setSelectedClass(e.target.value)}
+                        >
+                          {availableClasses.length === 0 ? <option>Tunggu Data...</option> : availableClasses.map(c => <option key={c} value={c}>Kelas {c}</option>)}
+                        </select>
+                        <button onClick={handleExportClassData} disabled={filteredStudentsByClass.length === 0} className="btn btn-primary flex items-center justify-center gap-2">
+                           <Download size={18} /> Ekspor CSV
+                        </button>
+                     </div>
+                  </div>
+
+                  {filteredStudentsByClass.length > 0 ? (
+                     <div className="glass-panel overflow-x-auto" style={{padding: '1rem'}}>
+                        <table className="w-full text-sm text-left text-gray-300">
+                           <thead className="text-xs uppercase bg-black/50 border-b border-gray-700">
+                              <tr>
+                                 <th className="px-4 py-4">NIS/NIP</th>
+                                 <th className="px-4 py-4">Nama Lengkap</th>
+                                 <th className="px-4 py-4">Kelas</th>
+                                 <th className="px-4 py-4">Rata-rata Nilai</th>
+                                 <th className="px-4 py-4">Total Sesi</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {filteredStudentsByClass.map((s, i) => {
+                                 const history = s.history || [];
+                                 const avg = history.length > 0 ? Math.round(history.reduce((acc, sess) => acc + (sess.jumlahBenar / sess.totalSoal * 100), 0) / history.length) : 0;
+                                 return (
+                                    <tr key={i} className="border-b border-gray-800 hover:bg-black/20">
+                                       <td className="px-4 py-3">{s.id}</td>
+                                       <td className="px-4 py-3 font-medium text-white">{s.nama}</td>
+                                       <td className="px-4 py-3">{s.kelas}</td>
+                                       <td className="px-4 py-3">
+                                          <span className={`px-2 py-1 rounded text-xs font-bold ${avg >= 70 ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                                             {avg}%
+                                          </span>
+                                       </td>
+                                       <td className="px-4 py-3">{history.length}</td>
+                                    </tr>
+                                 );
+                              })}
+                           </tbody>
+                        </table>
+                     </div>
+                  ) : (
+                     <div className="glass-panel text-center py-12">
+                        <p className="text-muted">Tidak ada siswa untuk kelas ini.</p>
+                     </div>
+                  )}
+               </div>
+            )}
 
          </div>
        )}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { addUser, bulkAddUsers } from '../dbServices';
-import { UserPlus, ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle } from 'lucide-react';
+import { addUser, bulkAddUsers, fetchUsers, deleteAllUsers } from '../dbServices';
+import { UserPlus, ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Download, Trash2, Database } from 'lucide-react';
 import Papa from 'papaparse';
 
 const CLASS_OPTIONS = [
@@ -136,6 +136,51 @@ export default function AdminUI({ onBack }) {
     } catch (err) {
       setImportStatus(prev => ({ ...prev, loading: false, syncing: false, error: 'Terjadi kesalahan: ' + err.message }));
     }
+  };
+
+  const handleExportAll = async () => {
+     try {
+        const users = await fetchUsers();
+        if (users.length === 0) {
+           alert("Tidak ada data di server.");
+           return;
+        }
+        
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "NIS/NIP,Nama Lengkap,Role,Kelas,Level,XP,Sesi Selesai\n";
+        
+        users.forEach(u => {
+           const historyCount = u.history ? u.history.length : 0;
+           csvContent += `${u.id},"${u.nama}",${u.role},${u.kelas},${u.level || 1},${u.xp || 0},${historyCount}\n`;
+        });
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Backup_Data_Server_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+     } catch (err) {
+        alert("Gagal mengekspor data: " + err.message);
+     }
+  };
+
+  const handleResetData = async () => {
+     const confirm1 = window.confirm("PERINGATAN: Anda akan menghapus SELURUH akun siswa dan guru beserta riwayat pelatihannya dari database. Apakah Anda yakin?");
+     if (confirm1) {
+        const confirm2 = window.prompt("Ketik 'HAPUS SEMUA' untuk mengonfirmasi penghapusan:");
+        if (confirm2 === 'HAPUS SEMUA') {
+           try {
+              await deleteAllUsers();
+              alert("Seluruh data berhasil dihapus dari server.");
+           } catch (err) {
+              alert("Gagal menghapus data: " + err.message);
+           }
+        } else {
+           alert("Konfirmasi gagal atau dibatalkan. Data tidak dihapus.");
+        }
+     }
   };
 
   return (
@@ -314,8 +359,29 @@ export default function AdminUI({ onBack }) {
                     <p className="text-sm">{importStatus.error}</p>
                  </div>
               )}
-           </div>
-        </div>
+            </div>
+
+            {/* Manajemen Basis Data */}
+            <div className="glass-panel md:col-span-2" style={{height: 'fit-content'}}>
+               <div className="flex items-center gap-2 mb-6">
+                  <Database size={24} color="var(--primary)" />
+                  <h2 style={{fontSize: '1.2rem', fontWeight: 600}}>Manajemen Basis Data Server</h2>
+               </div>
+               <p className="text-sm mb-6 text-muted">Gunakan fitur ini untuk membackup seluruh data akun (Siswa dan Guru) ke format Excel atau mengatur ulang (reset) server ke kondisi kosong awal.</p>
+               
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <button onClick={handleExportAll} className="btn btn-outline flex flex-col items-center justify-center gap-3 py-8 hover:bg-primary/20">
+                     <Download size={32} />
+                     <span>Ekspor Seluruh Data (CSV)</span>
+                  </button>
+                  <button onClick={handleResetData} className="btn flex flex-col items-center justify-center gap-3 py-8 bg-red-900/40 hover:bg-red-600/60 border border-red-500/50 text-red-200">
+                     <Trash2 size={32} />
+                     <span>Reset Seluruh Data</span>
+                  </button>
+               </div>
+            </div>
+
+         </div>
      </div>
   );
 }

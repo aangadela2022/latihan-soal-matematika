@@ -147,3 +147,19 @@ export const addSessionHistory = async (userId, sessionData) => {
         console.error("Error adding session history:", e);
     }
 };
+
+export const deleteAllUsers = async () => {
+    try {
+        if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi.");
+        const { error } = await supabase
+            .from('users')
+            .delete()
+            .neq('id', ''); // Delete all rows where id is not empty (effectively all rows)
+
+        if (error) throw error;
+        return true;
+    } catch (e) {
+        console.error("Error deleting all users:", e);
+        throw e;
+    }
+};
