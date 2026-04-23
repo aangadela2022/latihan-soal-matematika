@@ -18,7 +18,7 @@ export default function AdminUI({ onBack }) {
   const [kelas, setKelas] = useState(CLASS_OPTIONS[0]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [importStatus, setImportStatus] = useState({ loading: false, syncing: false, success: 0, total: 0, error: '' });
+  const [importStatus, setImportStatus] = useState({ loading: false, syncing: false, success: 0, skipped: 0, total: 0, error: '' });
   const [manualMode, setManualMode] = useState('single'); // 'single' or 'bulk'
   const [bulkData, setBulkData] = useState('');
   const [previewData, setPreviewData] = useState(null);
@@ -153,11 +153,14 @@ export default function AdminUI({ onBack }) {
     if (!previewData || previewData.length === 0) return;
     setImportStatus(prev => ({ ...prev, loading: true, syncing: true }));
     try {
-      await bulkAddUsers(previewData, (completed) => {
+      const result = await bulkAddUsers(previewData, (completed) => {
          setImportStatus(prev => ({ ...prev, success: completed }));
       });
-      setImportStatus(prev => ({ ...prev, loading: false, syncing: false }));
+      const added = result?.added ?? 0;
+      const skipped = result?.skipped ?? 0;
+      setImportStatus(prev => ({ ...prev, loading: false, syncing: false, success: added, skipped, total: previewData.length }));
       setPreviewData(null);
+      loadAllUsers();
     } catch (err) {
       setImportStatus(prev => ({ ...prev, loading: false, syncing: false, error: 'Terjadi kesalahan: ' + err.message }));
     }
@@ -448,10 +451,12 @@ export default function AdminUI({ onBack }) {
                        )}
                        <p className="text-sm" style={{fontWeight: 600}}>
                           {importStatus.syncing
-                            ? `✅ ${importStatus.success} data divalidasi — menyimpan ke server...`
+                            ? `Memeriksa & menyimpan data baru ke server...`
                             : importStatus.loading
                             ? `Membaca file CSV...`
-                            : `✅ Berhasil tersimpan ${importStatus.success} dari ${importStatus.total} data ke server!`
+                            : importStatus.success === 0 && importStatus.skipped > 0
+                            ? `ℹ️ Semua ${importStatus.skipped} data sudah ada — tidak ada yang ditambahkan.`
+                            : `✅ ${importStatus.success} data baru berhasil ditambahkan${importStatus.skipped > 0 ? ` · ${importStatus.skipped} dilewati (sudah ada)` : ''}`
                           }
                        </p>
                     </div>

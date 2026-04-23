@@ -74,20 +74,36 @@ export const bulkAddUsers = async (users, onProgress) => {
             history: [],
         }));
 
-        // Deduplicate data by ID (keep the last occurrence) to prevent "ON CONFLICT DO UPDATE command cannot affect row a second time"
+        // Deduplicate within import batch itself (keep last occurrence)
         const uniqueDataMap = new Map();
         for (const item of dataToInsert) {
             uniqueDataMap.set(item.id, item);
         }
         const uniqueDataToInsert = Array.from(uniqueDataMap.values());
 
-        // Optimistic UI: langsung update progress
-        if (onProgress) onProgress(uniqueDataToInsert.length);
+        // Fetch all existing IDs from DB to avoid overwriting existing data
+        const { data: existingRows, error: fetchError } = await supabase
+            .from('users')
+            .select('id');
+        if (fetchError) throw fetchError;
+
+        const existingIds = new Set((existingRows || []).map(r => String(r.id)));
+
+        // Only keep truly new records (skip if ID already exists)
+        const newData = uniqueDataToInsert.filter(item => !existingIds.has(String(item.id)));
+        const skippedCount = uniqueDataToInsert.length - newData.length;
+
+        if (onProgress) onProgress(newData.length);
+
+        if (newData.length === 0) {
+            // Nothing new to insert
+            return { added: 0, skipped: skippedCount };
+        }
 
         const CHUNK_SIZE = 500;
         const chunks = [];
-        for (let i = 0; i < uniqueDataToInsert.length; i += CHUNK_SIZE) {
-            chunks.push(uniqueDataToInsert.slice(i, i + CHUNK_SIZE));
+        for (let i = 0; i < newData.length; i += CHUNK_SIZE) {
+            chunks.push(newData.slice(i, i + CHUNK_SIZE));
         }
 
         const errors = [];
@@ -95,7 +111,7 @@ export const bulkAddUsers = async (users, onProgress) => {
             chunks.map(async (chunk) => {
                 const { error } = await supabase
                     .from('users')
-                    .upsert(chunk, { onConflict: 'id' });
+                    .insert(chunk);
                 if (error) errors.push(error.message);
             })
         );
@@ -103,6 +119,8 @@ export const bulkAddUsers = async (users, onProgress) => {
         if (errors.length > 0) {
             throw new Error(`Gagal menyimpan ke Supabase: ${errors[0]}`);
         }
+
+        return { added: newData.length, skipped: skippedCount };
     } catch (e) {
         console.error("Error bulk adding users:", e);
         throw e;
