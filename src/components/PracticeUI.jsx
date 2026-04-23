@@ -126,12 +126,14 @@ export default function PracticeUI({ user, onEndSession }) {
        setSelectedOpt(null);
        setShowFeedback(false);
     } else {
-       const sessAnalytics = localAnalytics[selectedTopic];
        let newLevel = user.level;
-       if (sessAnalytics && sessAnalytics.total >= 10 && sessAnalytics.correct / sessAnalytics.total >= 0.7 && user.level < 3) {
-          newLevel += 1;
-       } else if (sessAnalytics && sessAnalytics.total >= 10 && sessAnalytics.correct / sessAnalytics.total <= 0.3 && user.level > 1) {
-          newLevel -= 1;
+       const sessionRate = sessionScore.benar / sessionQs.length;
+       if (sessionQs.length > 0) {
+          if (sessionRate >= 0.7 && user.level < 3) {
+             newLevel += 1;
+          } else if (sessionRate <= 0.3 && user.level > 1) {
+             newLevel -= 1;
+          }
        }
 
        const historyObj = {
