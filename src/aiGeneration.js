@@ -19,12 +19,12 @@ const prompt = `Anda adalah seorang ahli pembuat soal matematika yang brilian.
 Sajikan persis 10 soal pilihan ganda matematika untuk topik "${topic}".
 Panduan WAJIB:
 1. Seluruh soal harus 100% berkonteks kehidupan sehari-hari yang realistis.
-2. WAJIB: Konteks dari ke-10 soal HARUS SANGAT BERVARIASI dan TIDAK BERULANG. Pastikan masing-masing soal mengambil tema yang berbeda (Misal: 1 soal tentang Olahraga, 1 soal tentang Belanja/Pasar, 1 tentang Memasak, 1 tentang Perjalanan/Transportasi, 1 tentang Alam/Lingkungan, 1 tentang Teknologi, 1 tentang Konstruksi, dll). Jangan gunakan tema yang sama berulang kali.
+2. WAJIB: Konteks dari ke-10 soal HARUS 100% BERBEDA SATU SAMA LAIN (Soal 1 hingga 10 TIDAK BOLEH ada konteks/tema yang mirip). Gunakan 10 tema berbeda secara ekstrem (Misal: 1 tentang Olahraga, 1 tentang Pasar, 1 tentang Medis, 1 tentang Transportasi Udara, 1 tentang Pertanian, 1 tentang Teknologi, 1 tentang Arsitektur, dll).
 3. Tingkat kognitif soal divariasikan antara C2 (Memahami), C3 (Mengaplikasikan), dan C4 (Menganalisis).
 4. Target kesulitan siswa adalah tingkat ${levelStr}.
-5. Setiap soal punya 4 opsi jawaban (indeks 0, 1, 2, 3), buatlah distraktor yang logis.
+5. Setiap soal punya 4 opsi jawaban (indeks 0, 1, 2, 3). SANGAT PENTING: Pastikan ke-4 opsi jawaban memiliki nilai/angka/teks yang BERBEDA SATU SAMA LAIN. TIDAK BOLEH ada pilihan jawaban yang sama (duplikat) di dalam satu soal.
 6. Berikan pembahasan detail dan rasional, jangan hanya memberi hasil akhir.
-6. Kembalikan HANYA berwujud array JSON murni tanpa awalan/akhiran text maupun markdown "json". Struktur JSON:
+7. Kembalikan HANYA berwujud array JSON murni tanpa awalan/akhiran text maupun markdown "json". Struktur JSON:
 [
   {
     "pertanyaan": "teks...",
