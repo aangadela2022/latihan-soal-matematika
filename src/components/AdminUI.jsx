@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { addUser, bulkAddUsers, fetchUsers, deleteAllUsers, updateUserProfile } from '../dbServices';
-import { UserPlus, ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Download, Trash2, Database, Search, Edit2 } from 'lucide-react';
+import { addUser, bulkAddUsers, fetchUsers, deleteAllUsers, updateUserProfile, resetAllPracticeData } from '../dbServices';
+import { UserPlus, ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle, Download, Trash2, Database, Search, Edit2, RotateCcw } from 'lucide-react';
 import Papa from 'papaparse';
 
 const CLASS_OPTIONS = [
@@ -8,6 +8,8 @@ const CLASS_OPTIONS = [
   "X NKPI 1", "X NKPI 2", "X APHP 1", "X APHP 2", "X TKJ 1", "X TKJ 2", "X TKJ 3", "X RPL 1", "X RPL 2", "X TAB 1", "X TAB 2", "X TAB 3", "X KULINER 1", "X KULINER 2", "X KULINER 3", "X APPL", "X TP 1", "X TP 2",
   "XI NKPI 1", "XI NKPI 2", "XI APHP 1", "XI APHP 2", "XI TKJ 1", "XI TKJ 2", "XI TKJ 3", "XI RPL 1", "XI RPL 2", "XI TAB 1", "XI TAB 2", "XI TAB 3", "XI KULINER 1", "XI KULINER 2", "XI KULINER 3", "XI APPL", "XI TP 1", "XI TP 2"
 ];
+
+const CONFIRM_KEYWORD = 'serang12345';
 
 export default function AdminUI({ onBack }) {
   const [nama, setNama] = useState('');
@@ -25,6 +27,10 @@ export default function AdminUI({ onBack }) {
   const [allUsers, setAllUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingUser, setEditingUser] = useState(null);
+
+  // Confirmation modal state
+  const [confirmModal, setConfirmModal] = useState(null); // { type: 'reset'|'delete', keyword: '' }
+  const [confirmInput, setConfirmInput] = useState('');
 
   const INIT_TOPICS = () => ({ "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 } });
 
@@ -185,25 +191,121 @@ export default function AdminUI({ onBack }) {
      }
   };
 
-  const handleResetData = async () => {
-     const confirm1 = window.confirm("PERINGATAN: Anda akan menghapus SELURUH akun siswa dan guru beserta riwayat pelatihannya dari database. Apakah Anda yakin?");
-     if (confirm1) {
-        const confirm2 = window.prompt("Ketik 'HAPUS SEMUA' untuk mengonfirmasi penghapusan:");
-        if (confirm2 === 'HAPUS SEMUA') {
-           try {
-              await deleteAllUsers();
-              alert("Seluruh data berhasil dihapus dari server.");
-           } catch (err) {
-              alert("Gagal menghapus data: " + err.message);
-           }
+  const handleResetData = () => {
+     setConfirmInput('');
+     setConfirmModal({ type: 'delete' });
+  };
+
+  const handleResetPracticeData = () => {
+     setConfirmInput('');
+     setConfirmModal({ type: 'reset' });
+  };
+
+  const handleConfirmAction = async () => {
+     if (confirmInput !== CONFIRM_KEYWORD) return;
+     const type = confirmModal.type;
+     setConfirmModal(null);
+     setConfirmInput('');
+     try {
+        if (type === 'delete') {
+           await deleteAllUsers();
+           setMessage('Seluruh akun berhasil dihapus dari server.');
+           loadAllUsers();
         } else {
-           alert("Konfirmasi gagal atau dibatalkan. Data tidak dihapus.");
+           await resetAllPracticeData();
+           setMessage('Data latihan berhasil di-reset untuk seluruh pengguna.');
+           loadAllUsers();
         }
+     } catch (err) {
+        setMessage(`Gagal: ${err.message}`);
      }
   };
 
   return (
      <div className="container animate-fade-in" style={{minHeight: '100vh', padding: '2rem 0'}}>
+
+        {/* ── Confirmation Modal ── */}
+        {confirmModal && (
+           <div style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(0,0,0,0.75)',
+              backdropFilter: 'blur(6px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '1rem'
+           }}>
+              <div className="glass-panel" style={{
+                 maxWidth: '440px', width: '100%',
+                 border: confirmModal.type === 'delete' ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(234,179,8,0.5)',
+                 boxShadow: confirmModal.type === 'delete' ? '0 0 32px rgba(239,68,68,0.2)' : '0 0 32px rgba(234,179,8,0.2)'
+              }}>
+                 <div className="flex items-center gap-3 mb-4">
+                    {confirmModal.type === 'delete'
+                       ? <Trash2 size={28} color="#ef4444" />
+                       : <RotateCcw size={28} color="#eab308" />}
+                    <h3 style={{fontSize: '1.1rem', fontWeight: 700, color: confirmModal.type === 'delete' ? '#ef4444' : '#eab308'}}>
+                       {confirmModal.type === 'delete' ? 'Hapus Seluruh Akun' : 'Reset Data Latihan'}
+                    </h3>
+                 </div>
+
+                 <p className="text-sm mb-2" style={{color: 'var(--text-muted)', lineHeight: 1.6}}>
+                    {confirmModal.type === 'delete'
+                       ? 'Tindakan ini akan menghapus SEMUA akun siswa dan guru beserta seluruh riwayat latihan secara permanen dan tidak dapat dibatalkan.'
+                       : 'Tindakan ini akan mereset XP, riwayat latihan, dan analitik seluruh siswa. Akun tidak akan dihapus.'}
+                 </p>
+
+                 <p className="text-sm mb-4" style={{color: 'white', fontWeight: 600}}>
+                    Ketik <code style={{
+                       background: 'rgba(255,255,255,0.1)', padding: '2px 8px',
+                       borderRadius: '6px', letterSpacing: '0.05em',
+                       color: confirmModal.type === 'delete' ? '#f87171' : '#fde047'
+                    }}>{CONFIRM_KEYWORD}</code> untuk melanjutkan:
+                 </p>
+
+                 <input
+                    type="text"
+                    autoFocus
+                    placeholder={`Ketik ${CONFIRM_KEYWORD}`}
+                    value={confirmInput}
+                    onChange={(e) => setConfirmInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmAction(); if (e.key === 'Escape') { setConfirmModal(null); setConfirmInput(''); } }}
+                    style={{
+                       width: '100%', padding: '0.75rem 1rem',
+                       background: 'rgba(0,0,0,0.5)',
+                       border: `1px solid ${confirmInput === CONFIRM_KEYWORD ? (confirmModal.type === 'delete' ? '#ef4444' : '#eab308') : 'var(--surface-border)'}`,
+                       borderRadius: '8px', color: 'white', fontSize: '0.95rem',
+                       outline: 'none', marginBottom: '1.25rem',
+                       transition: 'border-color 0.2s'
+                    }}
+                 />
+
+                 <div className="flex gap-3">
+                    <button
+                       onClick={() => { setConfirmModal(null); setConfirmInput(''); }}
+                       className="btn btn-outline flex-1"
+                    >
+                       Batal
+                    </button>
+                    <button
+                       onClick={handleConfirmAction}
+                       disabled={confirmInput !== CONFIRM_KEYWORD}
+                       className="btn flex-1"
+                       style={{
+                          background: confirmInput !== CONFIRM_KEYWORD
+                             ? 'rgba(100,100,100,0.3)'
+                             : confirmModal.type === 'delete' ? 'rgba(239,68,68,0.8)' : 'rgba(234,179,8,0.8)',
+                          color: 'white',
+                          cursor: confirmInput !== CONFIRM_KEYWORD ? 'not-allowed' : 'pointer',
+                          opacity: confirmInput !== CONFIRM_KEYWORD ? 0.5 : 1,
+                          transition: 'all 0.2s'
+                       }}
+                    >
+                       {confirmModal.type === 'delete' ? 'Ya, Hapus Semua' : 'Ya, Reset Latihan'}
+                    </button>
+                 </div>
+              </div>
+           </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8" style={{maxWidth: '1100px', margin: '0 auto'}}>
            
            {/* Form Input Manual */}
@@ -388,14 +490,18 @@ export default function AdminUI({ onBack }) {
                </div>
                <p className="text-sm mb-6 text-muted">Gunakan fitur ini untuk membackup seluruh data akun (Siswa dan Guru) ke format Excel atau mengatur ulang (reset) server ke kondisi kosong awal.</p>
                
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <button onClick={handleExportAll} className="btn btn-outline flex flex-col items-center justify-center gap-3 py-8 hover:bg-primary/20">
                      <Download size={32} />
                      <span>Ekspor Seluruh Data (CSV)</span>
                   </button>
+                  <button onClick={handleResetPracticeData} className="btn flex flex-col items-center justify-center gap-3 py-8 bg-yellow-900/40 hover:bg-yellow-600/60 border border-yellow-500/50 text-yellow-200">
+                     <RotateCcw size={32} />
+                     <span>Reset Data Latihan</span>
+                  </button>
                   <button onClick={handleResetData} className="btn flex flex-col items-center justify-center gap-3 py-8 bg-red-900/40 hover:bg-red-600/60 border border-red-500/50 text-red-200">
                      <Trash2 size={32} />
-                     <span>Reset Seluruh Data</span>
+                     <span>Hapus Seluruh Akun</span>
                   </button>
                </div>
             </div>

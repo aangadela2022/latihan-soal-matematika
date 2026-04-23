@@ -178,3 +178,26 @@ export const updateUserProfile = async (userId, dataBaru) => {
         throw e;
     }
 };
+
+export const resetAllPracticeData = async () => {
+    try {
+        if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi.");
+        const INIT_TOPICS = { "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 } };
+        
+        const { error } = await supabase
+            .from('users')
+            .update({
+                xp: 0,
+                level: 1,
+                history: [],
+                analytics: INIT_TOPICS
+            })
+            .neq('id', ''); // update all
+
+        if (error) throw error;
+        return true;
+    } catch (e) {
+        console.error("Error resetting practice data:", e);
+        throw e;
+    }
+};
