@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Award, TrendingUp, ChevronRight, Brain, LayoutDashboard, History, Trophy, Medal } from 'lucide-react';
+import { User, Award, TrendingUp, ChevronRight, Brain, LayoutDashboard, History, Trophy, Medal, ChevronLeft } from 'lucide-react';
 import HistoryUI from './HistoryUI';
 import { fetchUsers } from '../dbServices';
 
@@ -7,6 +7,8 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
   const [activeTab, setActiveTab] = useState('beranda');
   const [leaderboard, setLeaderboard] = useState([]);
   const [myRankInfo, setMyRankInfo] = useState(null);
+  const [rankPage, setRankPage] = useState(1);
+  const RANK_PER_PAGE = 30;
 
   useEffect(() => {
     const loadLeaderboard = async () => {
@@ -51,7 +53,7 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
       }
     };
     
-    if (activeTab === 'beranda') {
+    if (activeTab === 'beranda' || activeTab === 'ranking') {
        loadLeaderboard();
     }
   }, [activeTab, user.id, user.history]); // Dependensi user.history agar rank update usai latihan
@@ -105,6 +107,9 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
          <button className={`btn ${activeTab === 'beranda' ? 'btn-primary shadow-glow' : 'btn-outline border-none text-muted'}`} onClick={() => setActiveTab('beranda')} style={{padding: '0.5rem 1rem'}}>
             <LayoutDashboard size={18} /> Beranda
          </button>
+         <button className={`btn ${activeTab === 'ranking' ? 'btn-primary shadow-glow' : 'btn-outline border-none text-muted'}`} onClick={() => { setActiveTab('ranking'); setRankPage(1); }} style={{padding: '0.5rem 1rem'}}>
+            <Trophy size={18} /> Ranking
+         </button>
          <button className={`btn ${activeTab === 'riwayat' ? 'btn-primary shadow-glow' : 'btn-outline border-none text-muted'}`} onClick={() => setActiveTab('riwayat')} style={{padding: '0.5rem 1rem'}}>
             <History size={18} /> Riwayat Saya
          </button>
@@ -122,56 +127,33 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
                </p>
             </div>
 
-            {/* Papan Peringkat */}
+            {/* Papan Peringkat Mini (Top 3) */}
             {leaderboard.length > 0 && (
                <div className="glass-panel mb-8" style={{border: '1px solid rgba(255,215,0,0.3)'}}>
-                  <div className="flex justify-between items-center mb-6">
+                  <div className="flex justify-between items-center mb-4">
                      <div className="flex items-center gap-3">
-                        <Trophy size={24} color="#FFD700" className="glow-effect-subtle" />
-                        <h3 style={{fontWeight: 700, fontSize: '1.2rem', color: '#FFD700'}}>Papan Peringkat Top 5</h3>
+                        <Trophy size={22} color="#FFD700" className="glow-effect-subtle" />
+                        <h3 style={{fontWeight: 700, fontSize: '1.1rem', color: '#FFD700'}}>Top 3 Peringkat</h3>
                      </div>
                      {myRankInfo && (
-                        <div className="badge" style={{background: 'rgba(255,215,0,0.15)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)', padding: '0.5rem 1rem'}}>
-                           Peringkat Anda: <strong className="ml-1">#{myRankInfo.rank}</strong> <span className="opacity-80 ml-1">dari {myRankInfo.total} Siswa</span>
+                        <div className="badge" style={{background: 'rgba(255,215,0,0.15)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)', padding: '0.4rem 0.8rem', fontSize: '0.8rem'}}>
+                           Peringkat Anda: <strong className="ml-1">#{myRankInfo.rank}</strong> <span className="opacity-80 ml-1">dari {myRankInfo.total}</span>
                         </div>
                      )}
                   </div>
-                  
-                  <div className="overflow-x-auto">
-                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs uppercase bg-black/40 text-gray-400">
-                           <tr>
-                              <th className="px-4 py-3 rounded-tl-lg w-16 text-center">Rank</th>
-                              <th className="px-4 py-3">Nama Siswa</th>
-                              <th className="px-4 py-3">Kelas</th>
-                              <th className="px-4 py-3 text-center">XP</th>
-                              <th className="px-4 py-3 text-center">Rata-rata</th>
-                              <th className="px-4 py-3 text-center rounded-tr-lg">Latihan</th>
-                           </tr>
-                        </thead>
-                        <tbody>
-                           {leaderboard.slice(0, 5).map((student, index) => {
-                              const isMe = student.id === user.id;
-                              let rankIcon = <span className="text-gray-400 font-bold">#{index + 1}</span>;
-                              if (index === 0) rankIcon = <Medal size={22} color="#FFD700" />;
-                              else if (index === 1) rankIcon = <Medal size={22} color="#C0C0C0" />;
-                              else if (index === 2) rankIcon = <Medal size={22} color="#CD7F32" />;
-
-                              return (
-                                 <tr key={student.id} className={`border-b border-gray-800 ${isMe ? 'bg-primary/20' : 'hover:bg-black/20'}`}>
-                                    <td className="px-4 py-3 flex items-center justify-center">{rankIcon}</td>
-                                    <td className={`px-4 py-3 font-medium ${isMe ? 'text-white' : 'text-gray-200'}`}>
-                                       {student.nama} {isMe && <span className="text-[10px] ml-2 bg-primary/40 px-1.5 py-0.5 rounded text-primary-content uppercase tracking-wider">Saya</span>}
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-400">{student.kelas}</td>
-                                    <td className="px-4 py-3 text-center font-bold text-secondary">{student.xp}</td>
-                                    <td className="px-4 py-3 text-center text-gray-300">{Math.round(student.averageScore)}%</td>
-                                    <td className="px-4 py-3 text-center text-gray-300">{student.totalSessions}</td>
-                                 </tr>
-                              );
-                           })}
-                        </tbody>
-                     </table>
+                  <div className="flex flex-col gap-2">
+                     {leaderboard.slice(0, 3).map((student, index) => {
+                        const isMe = student.id === user.id;
+                        const medals = ['#FFD700', '#C0C0C0', '#CD7F32'];
+                        return (
+                           <div key={student.id} className={`flex items-center gap-4 p-3 rounded-lg ${isMe ? 'bg-primary/20 border border-primary/40' : 'bg-black/20'}`}>
+                              <Medal size={22} color={medals[index]} />
+                              <span className="font-bold flex-1" style={{color: isMe ? 'white' : 'var(--text-main)'}}>{student.nama} {isMe && <span className="text-[10px] ml-2 bg-primary/40 px-1.5 py-0.5 rounded uppercase">Saya</span>}</span>
+                              <span className="text-xs text-muted">{student.kelas}</span>
+                              <span className="font-bold text-secondary text-sm">{student.xp} XP</span>
+                           </div>
+                        );
+                     })}
                   </div>
                </div>
             )}
@@ -191,6 +173,120 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
             </div>
          </div>
       )}
+
+      {/* TAB: RANKING LENGKAP */}
+      {activeTab === 'ranking' && (() => {
+        const totalPages = Math.ceil(leaderboard.length / RANK_PER_PAGE);
+        const pageData = leaderboard.slice((rankPage - 1) * RANK_PER_PAGE, rankPage * RANK_PER_PAGE);
+        return (
+          <div className="animate-fade-in">
+            <div className="glass-panel mb-4" style={{border: '1px solid rgba(255,215,0,0.2)'}}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <Trophy size={26} color="#FFD700" className="glow-effect-subtle" />
+                  <div>
+                    <h3 style={{fontWeight: 700, fontSize: '1.2rem', color: '#FFD700'}}>Papan Peringkat Seluruh Siswa</h3>
+                    <p style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>Diurutkan berdasarkan XP → Rata-rata → Total Latihan</p>
+                  </div>
+                </div>
+                {myRankInfo && (
+                  <div style={{background: 'rgba(255,215,0,0.12)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.35)', borderRadius: '10px', padding: '0.5rem 1.1rem', fontWeight: 600, fontSize: '0.9rem'}}>
+                    Peringkat Saya: <strong>#{myRankInfo.rank}</strong> <span style={{opacity: 0.75}}>dari {myRankInfo.total} Siswa</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead>
+                    <tr style={{background: 'rgba(0,0,0,0.45)', color: '#9ca3af', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em'}}>
+                      <th className="px-4 py-3 w-16 text-center rounded-tl-lg">Rank</th>
+                      <th className="px-4 py-3">Nama Siswa</th>
+                      <th className="px-4 py-3">Kelas</th>
+                      <th className="px-4 py-3 text-center">XP</th>
+                      <th className="px-4 py-3 text-center">Rata-rata</th>
+                      <th className="px-4 py-3 text-center rounded-tr-lg">Latihan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pageData.map((student, idx) => {
+                      const globalIdx = (rankPage - 1) * RANK_PER_PAGE + idx;
+                      const isMe = student.id === user.id;
+                      let rankDisplay;
+                      if (globalIdx === 0) rankDisplay = <Medal size={20} color="#FFD700" />;
+                      else if (globalIdx === 1) rankDisplay = <Medal size={20} color="#C0C0C0" />;
+                      else if (globalIdx === 2) rankDisplay = <Medal size={20} color="#CD7F32" />;
+                      else rankDisplay = <span style={{color: '#6b7280', fontWeight: 700}}>#{globalIdx + 1}</span>;
+
+                      return (
+                        <tr
+                          key={student.id}
+                          style={{
+                            borderBottom: '1px solid rgba(255,255,255,0.05)',
+                            background: isMe ? 'rgba(79,70,229,0.18)' : 'transparent',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseEnter={e => { if (!isMe) e.currentTarget.style.background = 'rgba(0,0,0,0.2)'; }}
+                          onMouseLeave={e => { if (!isMe) e.currentTarget.style.background = 'transparent'; }}
+                        >
+                          <td className="px-4 py-3" style={{textAlign: 'center'}}>
+                            <span className="flex items-center justify-center">{rankDisplay}</span>
+                          </td>
+                          <td className="px-4 py-3" style={{fontWeight: isMe ? 700 : 500, color: isMe ? 'white' : '#e5e7eb'}}>
+                            {student.nama}
+                            {isMe && <span style={{fontSize: '0.65rem', marginLeft: '0.4rem', background: 'rgba(79,70,229,0.5)', color: '#a5b4fc', padding: '0.15rem 0.4rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.06em'}}>Saya</span>}
+                          </td>
+                          <td className="px-4 py-3" style={{color: '#9ca3af'}}>{student.kelas}</td>
+                          <td className="px-4 py-3 text-center" style={{fontWeight: 700, color: 'var(--secondary)'}}>{student.xp}</td>
+                          <td className="px-4 py-3 text-center" style={{color: '#d1d5db'}}>{Math.round(student.averageScore)}%</td>
+                          <td className="px-4 py-3 text-center" style={{color: '#d1d5db'}}>{student.totalSessions}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Paginasi */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-5 pt-4" style={{borderTop: '1px solid rgba(255,255,255,0.07)'}}>
+                  <span style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>
+                    Halaman {rankPage} dari {totalPages} · {leaderboard.length} siswa
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setRankPage(p => Math.max(1, p - 1))}
+                      disabled={rankPage === 1}
+                      className="btn btn-outline p-2"
+                      style={{opacity: rankPage === 1 ? 0.4 : 1}}
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    {Array.from({length: totalPages}, (_, i) => i + 1).map(pg => (
+                      <button
+                        key={pg}
+                        onClick={() => setRankPage(pg)}
+                        className={`btn ${pg === rankPage ? 'btn-primary' : 'btn-outline'}`}
+                        style={{padding: '0.35rem 0.75rem', minWidth: '2.2rem'}}
+                      >
+                        {pg}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setRankPage(p => Math.min(totalPages, p + 1))}
+                      disabled={rankPage === totalPages}
+                      className="btn btn-outline p-2"
+                      style={{opacity: rankPage === totalPages ? 0.4 : 1}}
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {activeTab === 'riwayat' && (
          <HistoryUI history={user.history || []} />

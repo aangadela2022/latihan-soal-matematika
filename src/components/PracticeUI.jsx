@@ -17,7 +17,9 @@ export default function PracticeUI({ user, onEndSession }) {
   const [sessionScore, setSessionScore] = useState({ benar: 0, totalXpDidapat: 0 });
 
   const TOPICS = ["Bilangan", "Aljabar", "Geometri", "Statistika", "Peluang"];
-  const [selectedTopic, setSelectedTopic] = useState("Bilangan");
+  const currentTopicIndex = (user.history ? user.history.length : 0) % TOPICS.length;
+  const allowedTopic = TOPICS[currentTopicIndex];
+  const [selectedTopic, setSelectedTopic] = useState(allowedTopic);
 
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -59,11 +61,20 @@ export default function PracticeUI({ user, onEndSession }) {
               )}
 
               <div className="grid grid-cols-2 gap-4 mb-8">
-                 {TOPICS.map(topic => (
-                    <button key={topic} className={`btn ${selectedTopic === topic ? 'btn-primary shadow-glow' : 'btn-outline shadow-none'}`} onClick={() => setSelectedTopic(topic)}>
-                       {topic}
-                    </button>
-                 ))}
+                 {TOPICS.map((topic, idx) => {
+                    const isAllowed = idx === currentTopicIndex;
+                    return (
+                       <button 
+                          key={topic} 
+                          className={`btn ${isAllowed ? 'btn-primary shadow-glow' : 'btn-outline shadow-none'}`} 
+                          onClick={() => isAllowed && setSelectedTopic(topic)}
+                          disabled={!isAllowed}
+                          style={{ opacity: isAllowed ? 1 : 0.5, cursor: isAllowed ? 'pointer' : 'not-allowed' }}
+                       >
+                          {topic}
+                       </button>
+                    );
+                 })}
               </div>
 
               <div className="flex gap-4">

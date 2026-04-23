@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUsers } from '../dbServices';
-import { PieChart, LogOut, RefreshCcw, Users, User, BarChart2, TrendingUp, Target, Download, FileText } from 'lucide-react';
+import { PieChart, LogOut, RefreshCcw, Users, User, BarChart2, TrendingUp, Target, Download, FileText, Trophy, Medal, ChevronLeft, ChevronRight } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
   LineChart, Line, ScatterChart, Scatter, Cell, AreaChart, Area 
@@ -11,7 +11,9 @@ const COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b'];
 export default function TeacherUI({ user, onLogout }) {
   const [allStudents, setAllStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState('class'); // 'class' or 'student'
+  const [view, setView] = useState('class'); // 'class', 'student', 'recap', 'ranking'
+  const [rankPage, setRankPage] = useState(1);
+  const RANK_PER_PAGE = 30;
   
   // Selection States
   const [selectedClass, setSelectedClass] = useState('');
@@ -160,6 +162,12 @@ export default function TeacherUI({ user, onLogout }) {
             onClick={() => setView('recap')}
           >
             <FileText size={18} /> Rekap Nilai
+          </button>
+          <button 
+            className={`btn whitespace-nowrap flex items-center justify-center gap-2 ${view === 'ranking' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => { setView('ranking'); setRankPage(1); }}
+          >
+            <Trophy size={18} /> Ranking
           </button>
        </div>
 
@@ -420,6 +428,137 @@ export default function TeacherUI({ user, onLogout }) {
                   )}
                </div>
             )}
+
+           {/* VIEW: RANKING SELURUH SISWA */}
+           {view === 'ranking' && (() => {
+             // Hitung statistik semua siswa
+             const ranked = allStudents.map(s => {
+               const history = s.history || [];
+               const totalSessions = history.length;
+               const totalScore = history.reduce((acc, h) => acc + (h.jumlahBenar / h.totalSoal) * 100, 0);
+               const averageScore = totalSessions > 0 ? totalScore / totalSessions : 0;
+               const xp = s.xp || 0;
+               return { ...s, totalSessions, averageScore, xp };
+             }).sort((a, b) => {
+               if (b.xp !== a.xp) return b.xp - a.xp;
+               if (b.averageScore !== a.averageScore) return b.averageScore - a.averageScore;
+               return b.totalSessions - a.totalSessions;
+             });
+
+             const totalPages = Math.ceil(ranked.length / 30);
+             const pageData = ranked.slice((rankPage - 1) * 30, rankPage * 30);
+
+             return (
+               <div className="flex flex-col gap-6 animate-fade-in">
+                 <div className="glass-panel" style={{border: '1px solid rgba(255,215,0,0.2)'}}>
+                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                     <div className="flex items-center gap-3">
+                       <Trophy size={26} color="#FFD700" className="glow-effect-subtle" />
+                       <div>
+                         <h3 style={{fontWeight: 700, fontSize: '1.2rem', color: '#FFD700'}}>Papan Peringkat Seluruh Siswa</h3>
+                         <p style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>Diurutkan: XP → Rata-rata → Total Latihan · {ranked.length} siswa terdaftar</p>
+                       </div>
+                     </div>
+                   </div>
+
+                   <div className="overflow-x-auto">
+                     <table className="w-full text-sm text-left">
+                       <thead>
+                         <tr style={{background: 'rgba(0,0,0,0.45)', color: '#9ca3af', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em'}}>
+                           <th className="px-4 py-3 w-16 text-center rounded-tl-lg">Rank</th>
+                           <th className="px-4 py-3">Nama Siswa</th>
+                           <th className="px-4 py-3">Kelas</th>
+                           <th className="px-4 py-3 text-center">XP</th>
+                           <th className="px-4 py-3 text-center">Rata-rata</th>
+                           <th className="px-4 py-3 text-center rounded-tr-lg">Latihan</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {pageData.map((student, idx) => {
+                           const globalIdx = (rankPage - 1) * 30 + idx;
+                           let rankDisplay;
+                           if (globalIdx === 0) rankDisplay = <Medal size={20} color="#FFD700" />;
+                           else if (globalIdx === 1) rankDisplay = <Medal size={20} color="#C0C0C0" />;
+                           else if (globalIdx === 2) rankDisplay = <Medal size={20} color="#CD7F32" />;
+                           else rankDisplay = <span style={{color: '#6b7280', fontWeight: 700}}>#{globalIdx + 1}</span>;
+
+                           const avg = Math.round(student.averageScore);
+
+                           return (
+                             <tr
+                               key={student.id}
+                               style={{
+                                 borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                 background: 'transparent',
+                                 transition: 'background 0.2s',
+                                 cursor: 'pointer'
+                               }}
+                               onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+                               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                             >
+                               <td className="px-4 py-3" style={{textAlign: 'center'}}>
+                                 <span className="flex items-center justify-center">{rankDisplay}</span>
+                               </td>
+                               <td className="px-4 py-3" style={{fontWeight: 500, color: '#e5e7eb'}}>{student.nama}</td>
+                               <td className="px-4 py-3">
+                                 <span style={{background: 'rgba(79,70,229,0.15)', color: '#a5b4fc', padding: '0.15rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600}}>
+                                   {student.kelas}
+                                 </span>
+                               </td>
+                               <td className="px-4 py-3 text-center" style={{fontWeight: 700, color: 'var(--secondary)'}}>{student.xp}</td>
+                               <td className="px-4 py-3 text-center">
+                                 <span style={{color: avg >= 70 ? 'var(--success)' : avg >= 50 ? '#f59e0b' : '#ef4444', fontWeight: 600}}>
+                                   {avg}%
+                                 </span>
+                               </td>
+                               <td className="px-4 py-3 text-center" style={{color: '#9ca3af'}}>{student.totalSessions}</td>
+                             </tr>
+                           );
+                         })}
+                       </tbody>
+                     </table>
+                   </div>
+
+                   {/* Paginasi */}
+                   {totalPages > 1 && (
+                     <div className="flex items-center justify-between mt-5 pt-4" style={{borderTop: '1px solid rgba(255,255,255,0.07)'}}>
+                       <span style={{fontSize: '0.8rem', color: 'var(--text-muted)'}}>
+                         Halaman {rankPage} dari {totalPages} · Total {ranked.length} siswa
+                       </span>
+                       <div className="flex items-center gap-2">
+                         <button
+                           onClick={() => setRankPage(p => Math.max(1, p - 1))}
+                           disabled={rankPage === 1}
+                           className="btn btn-outline p-2"
+                           style={{opacity: rankPage === 1 ? 0.4 : 1}}
+                         >
+                           <ChevronLeft size={18} />
+                         </button>
+                         {Array.from({length: totalPages}, (_, i) => i + 1).map(pg => (
+                           <button
+                             key={pg}
+                             onClick={() => setRankPage(pg)}
+                             className={`btn ${pg === rankPage ? 'btn-primary' : 'btn-outline'}`}
+                             style={{padding: '0.35rem 0.75rem', minWidth: '2.2rem'}}
+                           >
+                             {pg}
+                           </button>
+                         ))}
+                         <button
+                           onClick={() => setRankPage(p => Math.min(totalPages, p + 1))}
+                           disabled={rankPage === totalPages}
+                           className="btn btn-outline p-2"
+                           style={{opacity: rankPage === totalPages ? 0.4 : 1}}
+                         >
+                           <ChevronRight size={18} />
+                         </button>
+                       </div>
+                     </div>
+                   )}
+                 </div>
+               </div>
+             );
+           })()}
 
          </div>
        )}
