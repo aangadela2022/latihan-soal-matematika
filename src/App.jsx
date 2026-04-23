@@ -15,14 +15,46 @@ function App() {
      if (hasKey) {
         initAI();
         initSupabase();
+        
+        const savedUser = localStorage.getItem('loggedInUser');
+        if (savedUser) {
+           try {
+              const u = JSON.parse(savedUser);
+              if (u.role === 'admin') return 'admin';
+              if (u.role === 'guru') return 'teacher_dash';
+              return 'student_dash';
+           } catch(e) {}
+        }
         return 'login';
      }
      return 'config';
   });
-  const [currentUser, setCurrentUser] = useState(null);
+
+  const [currentUser, setCurrentUser] = useState(() => {
+     const savedUser = localStorage.getItem('loggedInUser');
+     if (savedUser) {
+        try { return JSON.parse(savedUser); } catch(e) { return null; }
+     }
+     return null;
+  });
+
+  useEffect(() => {
+     if (currentUser && currentUser.id && currentUser.role !== 'admin') {
+         import('./dbServices').then(({ fetchUsers }) => {
+            fetchUsers().then(users => {
+               const updatedUser = users.find(u => u.id === currentUser.id);
+               if (updatedUser) {
+                  setCurrentUser(updatedUser);
+                  localStorage.setItem('loggedInUser', JSON.stringify(updatedUser));
+               }
+            }).catch(err => console.error("Gagal sync user:", err));
+         });
+     }
+  }, []);
 
   const handleLogin = (user) => {
     setCurrentUser(user);
+    localStorage.setItem('loggedInUser', JSON.stringify(user));
     if (user.role === 'admin') {
       setView('admin');
     } else if (user.role === 'guru') {
@@ -35,6 +67,7 @@ function App() {
   const handleLogout = () => {
     setView('login');
     setCurrentUser(null);
+    localStorage.removeItem('loggedInUser');
   };
 
   if (view === 'config') return <ConfigUI onConfigComplete={() => {
