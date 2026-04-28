@@ -127,13 +127,13 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
                </p>
             </div>
 
-            {/* Papan Peringkat Mini (Top 3) */}
+            {/* Papan Peringkat Mini (Top 10) */}
             {leaderboard.length > 0 && (
                <div className="glass-panel mb-8" style={{border: '1px solid rgba(255,215,0,0.3)'}}>
                   <div className="flex justify-between items-center mb-4">
                      <div className="flex items-center gap-3">
                         <Trophy size={22} color="#FFD700" className="glow-effect-subtle" />
-                        <h3 style={{fontWeight: 700, fontSize: '1.1rem', color: '#FFD700'}}>Top 3 Peringkat</h3>
+                        <h3 style={{fontWeight: 700, fontSize: '1.1rem', color: '#FFD700'}}>🏆 Top 10 Peringkat</h3>
                      </div>
                      {myRankInfo && (
                         <div className="badge" style={{background: 'rgba(255,215,0,0.15)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)', padding: '0.4rem 0.8rem', fontSize: '0.8rem'}}>
@@ -142,19 +142,67 @@ export default function StudentUI({ user, onLogout, onStartPractice }) {
                      )}
                   </div>
                   <div className="flex flex-col gap-2">
-                     {leaderboard.slice(0, 3).map((student, index) => {
+                     {leaderboard.slice(0, 10).map((student, index) => {
                         const isMe = student.id === user.id;
-                        const medals = ['#FFD700', '#C0C0C0', '#CD7F32'];
+                        const medals = { 0: '#FFD700', 1: '#C0C0C0', 2: '#CD7F32' };
+                        const rankColors = ['rgba(255,215,0,0.08)', 'rgba(192,192,192,0.08)', 'rgba(205,127,50,0.08)'];
                         return (
-                           <div key={student.id} className={`flex items-center gap-4 p-3 rounded-lg ${isMe ? 'bg-primary/20 border border-primary/40' : 'bg-black/20'}`}>
-                              <Medal size={22} color={medals[index]} />
-                              <span className="font-bold flex-1" style={{color: isMe ? 'white' : 'var(--text-main)'}}>{student.nama} {isMe && <span className="text-[10px] ml-2 bg-primary/40 px-1.5 py-0.5 rounded uppercase">Saya</span>}</span>
-                              <span className="text-xs text-muted">{student.kelas}</span>
-                              <span className="font-bold text-secondary text-sm">{student.xp} XP</span>
+                           <div
+                              key={student.id}
+                              className={`flex items-center gap-3 p-3 rounded-lg ${isMe ? 'border border-primary/40' : ''}`}
+                              style={{
+                                 background: isMe
+                                    ? 'rgba(79,70,229,0.2)'
+                                    : index < 3 ? rankColors[index] : 'rgba(255,255,255,0.02)',
+                                 transition: 'background 0.2s'
+                              }}
+                           >
+                              {/* Rank badge */}
+                              <div style={{minWidth: '2rem', textAlign: 'center'}}>
+                                 {index < 3
+                                    ? <Medal size={20} color={medals[index]} />
+                                    : <span style={{color: '#6b7280', fontWeight: 700, fontSize: '0.85rem'}}>#{index + 1}</span>
+                                 }
+                              </div>
+                              <span className="font-bold flex-1" style={{color: isMe ? 'white' : 'var(--text-main)', fontSize: '0.9rem'}}>
+                                 {student.nama}
+                                 {isMe && <span className="text-[10px] ml-2 bg-primary/40 px-1.5 py-0.5 rounded uppercase">Saya</span>}
+                              </span>
+                              <span className="text-xs text-muted hidden sm:block">{student.kelas}</span>
+                              <div className="text-right" style={{minWidth: '90px'}}>
+                                 <div className="font-bold text-secondary text-sm">{student.xp} XP</div>
+                                 <div style={{fontSize: '0.7rem', color: 'var(--text-muted)'}}>
+                                    {Math.round(student.averageScore)}% · {student.totalSessions} sesi
+                                 </div>
+                              </div>
                            </div>
                         );
                      })}
                   </div>
+                  {/* Jika siswa saya di luar top 10 */}
+                  {myRankInfo && myRankInfo.rank > 10 && (() => {
+                     const me = leaderboard[myRankInfo.rank - 1];
+                     return me ? (
+                        <div className="mt-3 pt-3" style={{borderTop: '1px dashed rgba(255,255,255,0.1)'}}>
+                           <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/40" style={{background: 'rgba(79,70,229,0.15)'}}>
+                              <div style={{minWidth: '2rem', textAlign: 'center'}}>
+                                 <span style={{color: '#a5b4fc', fontWeight: 700, fontSize: '0.85rem'}}>#{myRankInfo.rank}</span>
+                              </div>
+                              <span className="font-bold flex-1" style={{color: 'white', fontSize: '0.9rem'}}>
+                                 {me.nama}
+                                 <span className="text-[10px] ml-2 bg-primary/40 px-1.5 py-0.5 rounded uppercase">Saya</span>
+                              </span>
+                              <span className="text-xs text-muted hidden sm:block">{me.kelas}</span>
+                              <div className="text-right" style={{minWidth: '90px'}}>
+                                 <div className="font-bold text-secondary text-sm">{me.xp} XP</div>
+                                 <div style={{fontSize: '0.7rem', color: 'var(--text-muted)'}}>
+                                    {Math.round(me.averageScore)}% · {me.totalSessions} sesi
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     ) : null;
+                  })()}
                </div>
             )}
 

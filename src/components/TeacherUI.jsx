@@ -251,15 +251,89 @@ export default function TeacherUI({ user, onLogout }) {
                              ))}
                           </div>
                        </div>
+                     </div>
+                    </>
+                  ) : (
+                    <div className="glass-panel text-center py-12">
+                       <p className="text-muted">Tidak ada data latihan untuk kelas ini.</p>
                     </div>
-                   </>
-                 ) : (
-                   <div className="glass-panel text-center py-12">
-                      <p className="text-muted">Tidak ada data latihan untuk kelas ini.</p>
-                   </div>
-                 )}
-              </div>
-           )}
+                  )}
+
+                  {/* ── Top 10 Peringkat Global ── */}
+                  {allStudents.length > 0 && (() => {
+                    const top10 = allStudents.map(s => {
+                      const history = s.history || [];
+                      const totalSessions = history.length;
+                      const totalScore = history.reduce((acc, h) => acc + (h.jumlahBenar / h.totalSoal) * 100, 0);
+                      const averageScore = totalSessions > 0 ? totalScore / totalSessions : 0;
+                      return { ...s, totalSessions, averageScore, xp: s.xp || 0 };
+                    }).sort((a, b) => {
+                      if (b.xp !== a.xp) return b.xp - a.xp;
+                      if (b.averageScore !== a.averageScore) return b.averageScore - a.averageScore;
+                      return b.totalSessions - a.totalSessions;
+                    }).slice(0, 10);
+
+                    const medalColors = { 0: '#FFD700', 1: '#C0C0C0', 2: '#CD7F32' };
+                    const rankBg = ['rgba(255,215,0,0.07)', 'rgba(192,192,192,0.07)', 'rgba(205,127,50,0.07)'];
+
+                    return (
+                      <div className="glass-panel" style={{border: '1px solid rgba(255,215,0,0.25)'}}>
+                        <div className="flex items-center gap-3 mb-5">
+                          <Trophy size={22} color="#FFD700" className="glow-effect-subtle" />
+                          <div>
+                            <h3 style={{fontWeight: 700, fontSize: '1.1rem', color: '#FFD700'}}>🏆 Top 10 Peringkat Seluruh Siswa</h3>
+                            <p style={{fontSize: '0.75rem', color: 'var(--text-muted)'}}>Diurutkan: XP → Rata-rata Nilai → Total Latihan</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          {top10.map((student, index) => {
+                            const avg = Math.round(student.averageScore);
+                            return (
+                              <div
+                                key={student.id}
+                                className="flex items-center gap-3 p-3 rounded-lg"
+                                style={{
+                                  background: index < 3 ? rankBg[index] : 'rgba(255,255,255,0.02)',
+                                  transition: 'background 0.2s'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                                onMouseLeave={e => e.currentTarget.style.background = index < 3 ? rankBg[index] : 'rgba(255,255,255,0.02)'}
+                              >
+                                {/* Rank */}
+                                <div style={{minWidth: '2rem', textAlign: 'center'}}>
+                                  {index < 3
+                                    ? <Medal size={20} color={medalColors[index]} />
+                                    : <span style={{color: '#6b7280', fontWeight: 700, fontSize: '0.85rem'}}>#{index + 1}</span>
+                                  }
+                                </div>
+                                {/* Nama */}
+                                <span className="font-bold flex-1" style={{color: '#e5e7eb', fontSize: '0.9rem'}}>{student.nama}</span>
+                                {/* Kelas badge */}
+                                <span style={{background: 'rgba(79,70,229,0.15)', color: '#a5b4fc', padding: '0.15rem 0.5rem', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 600}}>{student.kelas}</span>
+                                {/* Stats */}
+                                <div className="text-right" style={{minWidth: '100px'}}>
+                                  <div style={{fontWeight: 700, color: 'var(--secondary)', fontSize: '0.85rem'}}>{student.xp} XP</div>
+                                  <div style={{fontSize: '0.7rem', color: avg >= 70 ? 'var(--success)' : avg >= 50 ? '#f59e0b' : '#ef4444'}}>
+                                    {avg}% · {student.totalSessions} sesi
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-4 pt-3 text-center" style={{borderTop: '1px solid rgba(255,255,255,0.07)'}}>
+                          <button
+                            className="btn btn-outline text-xs px-4 py-1.5"
+                            onClick={() => { setView('ranking'); setRankPage(1); }}
+                          >
+                            Lihat Semua Peringkat →
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+               </div>
+            )}
 
            {/* VIEW: MONITORING SISWA */}
            {view === 'student' && (
