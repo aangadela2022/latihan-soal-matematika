@@ -200,7 +200,7 @@ export const updateUserProfile = async (userId, dataBaru) => {
 export const resetAllPracticeData = async () => {
     try {
         if (!supabase) throw new Error("Koneksi Supabase belum terinisialisasi.");
-        const INIT_TOPICS = { "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 } };
+        const INIT_TOPICS = { "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 }, "TKA": { total: 0, correct: 0 } };
         
         const { error } = await supabase
             .from('users')

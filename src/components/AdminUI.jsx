@@ -32,7 +32,7 @@ export default function AdminUI({ onBack }) {
   const [confirmModal, setConfirmModal] = useState(null); // { type: 'reset'|'delete', keyword: '' }
   const [confirmInput, setConfirmInput] = useState('');
 
-  const INIT_TOPICS = () => ({ "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 } });
+  const INIT_TOPICS = () => ({ "Bilangan": { total: 0, correct: 0 }, "Aljabar": { total: 0, correct: 0 }, "Geometri": { total: 0, correct: 0 }, "Statistika": { total: 0, correct: 0 }, "Peluang": { total: 0, correct: 0 }, "TKA": { total: 0, correct: 0 } });
 
   const loadAllUsers = async () => {
      try {

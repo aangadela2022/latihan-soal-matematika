@@ -6,7 +6,7 @@ import {
   LineChart, Line, ScatterChart, Scatter, Cell, AreaChart, Area 
 } from 'recharts';
 
-const COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b'];
+const COLORS = ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#db2777'];
 
 export default function TeacherUI({ user, onLogout }) {
   const [allStudents, setAllStudents] = useState([]);
@@ -49,7 +49,7 @@ export default function TeacherUI({ user, onLogout }) {
   const calculateClassStats = () => {
     if (filteredStudentsByClass.length === 0) return null;
 
-    const topics = ["Bilangan", "Aljabar", "Geometri", "Statistika", "Peluang"];
+    const topics = ["Bilangan", "Aljabar", "Geometri", "Statistika", "Peluang", "TKA"];
     const topicStats = topics.map(topic => {
        let totalScore = 0;
        let sessionCount = 0;
@@ -84,7 +84,7 @@ export default function TeacherUI({ user, onLogout }) {
     if (!selectedStudent) return null;
     
     const history = selectedStudent.history || [];
-    const topics = ["Bilangan", "Aljabar", "Geometri", "Statistika", "Peluang"];
+    const topics = ["Bilangan", "Aljabar", "Geometri", "Statistika", "Peluang", "TKA"];
     
     const topicBreakdown = topics.map(topic => {
       const sess = history.filter(h => h.topik === topic);

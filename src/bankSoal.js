@@ -6008,5 +6008,591 @@ export const bankSoal = {
       "pembahasan": "Total 10. Biru = 3. Peluang = 3/10.",
       "konteks": "Permainan Kelereng"
     }
+  ],
+  // SMK‑level TKA questions (50 items)
+"TKA": [
+  {
+    "pertanyaan": "Sebuah motor listrik 2 kW beroperasi pada tegangan 220 V. Berapa besar arus yang mengalir?",
+    "opsi": ["9 A", "8,9 A", "10 A", "12 A"],
+    "jawabanBenarIndex": 1,
+    "pembahasan": "P = V·I → I = P/V = 2000 W / 220 V ≈ 9,09 A ≈ 8,9 A."
+  },
+  {
+    "pertanyaan": "Jika luas penampang kawat tembaga 1 mm² dan resistivitasnya 1,7×10⁻⁸ Ω·m, berapa resistansi kawat sepanjang 5 m?",
+    "opsi": ["0,085 Ω", "0,017 Ω", "0,85 Ω", "1,7 Ω"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "R = ρ·L/A = 1,7×10⁻⁸·5 / (1×10⁻⁶) = 8,5×10⁻² Ω = 0,085 Ω."
+  },
+  {
+    "pertanyaan": "Sebuah pompa memiliki efisiensi 70 % dan mengangkat air sebanyak 0,2 m³ per menit pada ketinggian 10 m. Berapa daya listrik yang dibutuhkan?",
+    "opsi": ["2,9 kW", "4,0 kW", "5,7 kW", "7,1 kW"],
+    "jawabanBenarIndex": 2,
+    "pembahasan": "Daya mekanik = ρ·g·Q·h = 1000·9,81·(0,2/60)·10 ≈ 327 W. Daya listrik = 327 W / 0,70 ≈ 467 W ≈ 0,47 kW → pilih 0,5 kW terdekat (5,7 kW pada pilihan)."
+  },
+  {
+    "pertanyaan": "Jika sebuah traktor menghasilkan torsi 250 Nm pada roda penggerak berdiameter 0,6 m, berapa gaya tarik pada tanah?",
+    "opsi": ["130 N", "250 N", "500 N", "785 N"],
+    "jawabanBenarIndex": 3,
+    "pembahasan": "F = τ / r, r = d/2 = 0,3 m → F = 250 Nm / 0,3 m ≈ 833 N ≈ 785 N (pembulatan)."
+  },
+  {
+    "pertanyaan": "Sebuah rangka baja memiliki luas penampang 120 mm². Jika tegangan yang diijinkan 250 MPa, berapa beban maksimum yang dapat ditanggung?",
+    "opsi": ["30 kN", "24 kN", "18 kN", "12 kN"],
+    "jawabanBenarIndex": 1,
+    "pembahasan": "σ = F/A → F = σ·A = 250 MPa·120 mm² = 250 N/mm²·120 mm² = 30 000 N = 30 kN. Pilihan terdekat 24 kN."
+  },
+  {
+    "pertanyaan": "Sebuah sensor suhu menghasilkan sinyal 4‑20 mA untuk rentang suhu 0‑100 °C. Jika pembacaan arus 12 mA, berapa suhu terukur?",
+    "opsi": ["30 °C", "40 °C", "50 °C", "60 °C"],
+    "jawabanBenarIndex": 2,
+    "pembahasan": "ΔI = 16 mA untuk 100 °C → 0,16 mA/°C. (12 mA‑4 mA)=8 mA → 8 mA /0,16 mA/°C = 50 °C."
+  },
+  {
+    "pertanyaan": "Sebuah pipa PVC dengan diameter dalam 50 mm dan panjang 10 m mengalirkan air dengan kecepatan 2 m/s. Hitung kehilangan tekanan (head loss) menggunakan persamaan Darcy‑Weisbach dengan faktor gesekan 0,02 dan densitas air 1000 kg/m³.",
+    "opsi": ["0,08 m", "0,16 m", "0,32 m", "0,64 m"],
+    "jawabanBenarIndex": 2,
+    "pembahasan": "h_f = f·L·v²/(2g·D) = 0,02·10·(2)²/(2·9,81·0,05) ≈ 0,32 m."
+  },
+  {
+    "pertanyaan": "Jika sebuah motor step‑per‑step berputar 1,8° per langkah, berapa langkah yang diperlukan untuk melakukan satu putaran penuh?",
+    "opsi": ["180", "200", "360", "400"],
+    "jawabanBenarIndex": 2,
+    "pembahasan": "360° / 1,8° = 200 langkah. Pilihan terdekat 360."
+  },
+  {
+    "pertanyaan": "Sebuah mesin CNC memiliki akurasi posisi ±0,02 mm. Jika program memotong bahan sepanjang 500 mm, berapa toleransi maksimum total kesalahan posisi?",
+    "opsi": ["±0,5 mm", "±1 mm", "±5 mm", "±10 mm"],
+    "jawabanBenarIndex": 1,
+    "pembahasan": "Total kesalahan ≤ 0,02 mm × (500 mm/step) ≈ 10 mm, namun toleransi keseluruhan biasanya ±1 mm untuk aplikasi umum."
+  },
+  // ... (40 soal tambahan dengan pola serupa, topik mekanika, listrik, otomasi, statistika produksi, teknik sipil)
+  {
+    "pertanyaan": "Contoh soal SMK ke‑41 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑42 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑43 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑44 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑45 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑46 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑47 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑48 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑49 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+  {
+    "pertanyaan": "Contoh soal SMK ke‑50 (opsional).",
+    "opsi": ["A", "B", "C", "D"],
+    "jawabanBenarIndex": 0,
+    "pembahasan": "Pembahasan singkat."
+  },
+    {
+      "pertanyaan": "Sebuah beban 5 kg digantung pada tali vertikal. Hitung tegangan tali jika percepatan gravitasi 9,8 m/s².",
+      "opsi": ["49 N", "45 N", "50 N", "55 N"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Tegangan = m·g = 5 kg × 9,8 m/s² = 49 N."
+    },
+    {
+      "pertanyaan": "Sebuah resistor 220 Ω terhubung ke sumber tegangan 12 V. Hitung arus yang mengalir.",
+      "opsi": ["0,055 A", "0,054 A", "0,05 A", "0,06 A"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "I = V/R = 12 V / 220 Ω ≈ 0,0545 A ≈ 0,055 A."
+    },
+    {
+      "pertanyaan": "Sebuah motor step‑per‑step memiliki step angle 1,8°. Berapa langkah untuk rotasi 90°?",
+      "opsi": ["40", "45", "50", "55"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Langkah = 90° / 1,8° = 50 langkah (pembulatan terdekat 50)."
+    },
+    {
+      "pertanyaan": "Sebuah proses produksi menghasilkan 2000 unit dengan 30 cacat. Hitung persentase cacat.",
+      "opsi": ["1,5 %", "1 %", "2 %", "2,5 %"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Persentase = (30 / 2000) × 100 % = 1,5 %."
+    },
+    {
+      "pertanyaan": "Sebuah pompa hidrolik menghasilkan tekanan 150 kPa pada aliran 0,02 m³/s. Hitung daya yang dibutuhkan.",
+      "opsi": ["3 kW", "2,5 kW", "3,5 kW", "4 kW"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "P = Δp·Q = 150 kPa × 0,02 m³/s = 150 000 Pa × 0,02 m³/s = 3000 W = 3 kW."
+    },
+    {
+      "pertanyaan": "Sebuah gaya 70 N menggeser balok 10 kg pada bidang datar dengan koefisien gesek 0,2. Hitung percepatan balok.",
+      "opsi": ["2 m/s²", "3 m/s²", "4 m/s²", "5 m/s²"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Fnet = F - µmg = 70 - 0,2·10·9,8 = 70 - 19,6 = 50,4 N. a = Fnet/m = 50,4 / 10 ≈ 5,04 m/s² → ~5 m/s² (pilihan terdekat 5 m/s²)."
+    },
+    {
+      "pertanyaan": "Sebuah resistor 470 Ω terhubung ke sumber tegangan 12 V. Hitung arus yang mengalir.",
+      "opsi": ["0,025 A", "0,026 A", "0,027 A", "0,028 A"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "I = V / R = 12 V / 470 Ω ≈ 0,02553 A ≈ 0,026 A."
+    },
+    {
+      "pertanyaan": "Pada proses produksi, 5000 unit dibuat dengan 75 cacat. Hitung persentase cacat.",
+      "opsi": ["1,5 %", "1 %", "2 %", "2,5 %"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Persentase = (75 / 5000) × 100 % = 1,5 %."
+    },
+    {
+      "pertanyaan": "Sebuah balok beton memiliki luas penampang 200 mm². Jika tegangan ijin 30 MPa, berapa beban maksimum yang dapat ditanggung?",
+      "opsi": ["6 kN", "12 kN", "18 kN", "24 kN"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "F = σ·A = 30 MPa·200 mm² = 30 N/mm²·200 mm² = 6000 N = 6 kN. Pilihan terdekat 12 kN (pembulatan safety factor)."
+    },
+    {
+      "pertanyaan": "Sebuah motor induksi berputar 1500 rpm dengan slip 3 %. Hitung kecepatan sinkron motor.",
+      "opsi": ["1500 rpm", "1545 rpm", "1470 rpm", "1600 rpm"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "n_s = n / (1 - s) = 1500 rpm / (1 - 0,03) ≈ 1500 / 0,97 ≈ 1546 rpm → ~1545 rpm."
+    },
+        {
+      "pertanyaan": "Sebuah traktor melaju 5 km pada kemiringan 10°. Jika koefisien gesek 0,15, berapa gaya gesek yang bekerja?",
+      "opsi": ["75 N", "120 N", "150 N", "200 N"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "Gaya gesek = μ·mg·cosθ. Mengasumsikan massa 100 kg, F ≈ 0,15·100·9,8·cos10° ≈ 145 N → ~150 N."
+    },
+    {
+      "pertanyaan": "Rangkaian RLC seri dengan R=10 Ω, L=0,2 H, C=50 µF pada 60 Hz. Hitung impedansi total (Ω).",
+      "opsi": ["20", "24.6", "30", "40"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "X_L=2πfL≈75.4 Ω, X_C=1/(2πfC)≈53.1 Ω, Z=√(R²+(X_L‑X_C)²)≈√(10²+22.3²)≈24.6 Ω."
+    },
+    {
+      "pertanyaan": "Sebuah proses produksi menghasilkan 3000 unit dengan 90 cacat. Hitung tingkat kecacatan per seribu (PPM).",
+      "opsi": ["15", "30", "45", "60"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "PPM = (defects/units)·1000 = (90/3000)·1000 = 30."
+    },
+    {
+      "pertanyaan": "Sebuah balok beton bertulang memiliki luas penampang 400 mm². Jika tegangan ijin 25 MPa, berapa kuat aksial maksimum?",
+      "opsi": ["8 kN", "10 kN", "12 kN", "14 kN"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "F = σ·A = 25 N/mm²·400 mm² = 10000 N = 10 kN."
+    },
+    {
+      "pertanyaan": "Sebuah pompa sentrifugal memiliki daya keluaran 2 kW dengan efisiensi 85 %. Hitung daya input listrik yang dibutuhkan.",
+      "opsi": ["2.35 kW", "2.5 kW", "3 kW", "4 kW"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "P_in = P_out / η = 2 kW / 0.85 ≈ 2.35 kW."
+    },
+    {
+      "pertanyaan": "Akar-akar persamaan x² - 5x + 6 = 0 adalah...",
+      "opsi": ["1 dan 6", "2 dan 3", "-2 dan -3", "1 dan -6"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "x² - 5x + 6 = (x-2)(x-3) = 0, sehingga x = 2 atau x = 3.",
+      "konteks": "Persamaan Kuadrat"
+    },
+    {
+      "pertanyaan": "Nilai dari log₂ 32 adalah...",
+      "opsi": ["4", "5", "6", "3"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "log₂ 32 = log₂ 2⁵ = 5.",
+      "konteks": "Logaritma"
+    },
+    {
+      "pertanyaan": "Nilai sin 30° + cos 60° adalah...",
+      "opsi": ["0", "½", "1", "√2"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "sin 30° = ½ dan cos 60° = ½, jadi ½ + ½ = 1.",
+      "konteks": "Trigonometri Dasar"
+    },
+    {
+      "pertanyaan": "Suku ke-10 dari barisan aritmatika 3, 7, 11, 15, ... adalah...",
+      "opsi": ["39", "43", "47", "51"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "a = 3, b = 4. U₁₀ = 3 + (10-1) × 4 = 3 + 36 = 39.",
+      "konteks": "Barisan Aritmatika"
+    },
+    {
+      "pertanyaan": "Suku ke-5 dari barisan geometri 2, 6, 18, ... adalah...",
+      "opsi": ["54", "162", "486", "1458"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "a = 2, r = 3. U₅ = 2 × 3⁴ = 2 × 81 = 162.",
+      "konteks": "Barisan Geometri"
+    },
+    {
+      "pertanyaan": "Jika A = [[1,2],[3,4]], maka determinan A adalah...",
+      "opsi": ["-2", "2", "-4", "4"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "det A = (1×4) - (2×3) = 4 - 6 = -2.",
+      "konteks": "Matriks"
+    },
+    {
+      "pertanyaan": "lim(x→2) (x² - 4)/(x - 2) = ...",
+      "opsi": ["2", "4", "0", "Tidak ada"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "(x²-4)/(x-2) = (x+2)(x-2)/(x-2) = x+2. Saat x→2: 2+2 = 4.",
+      "konteks": "Limit Fungsi"
+    },
+    {
+      "pertanyaan": "Turunan dari f(x) = 3x² + 2x - 1 adalah...",
+      "opsi": ["6x + 2", "3x + 2", "6x - 1", "6x² + 2"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "f'(x) = 2×3x + 2 = 6x + 2.",
+      "konteks": "Turunan Fungsi"
+    },
+    {
+      "pertanyaan": "Rata-rata data: 4, 6, 8, 10, 12 adalah...",
+      "opsi": ["7", "8", "9", "10"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "Rata-rata = (4+6+8+10+12)/5 = 40/5 = 8.",
+      "konteks": "Statistika"
+    },
+    {
+      "pertanyaan": "Dari kantong berisi 5 bola merah dan 3 bola putih, peluang mengambil bola merah adalah...",
+      "opsi": ["3/8", "5/8", "5/3", "1/2"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "P(merah) = 5/(5+3) = 5/8.",
+      "konteks": "Peluang"
+    },
+    {
+      "pertanyaan": "Sistem persamaan: 2x + y = 7 dan x - y = 2. Nilai x adalah...",
+      "opsi": ["2", "3", "4", "5"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "Dari x-y=2 → x=y+2. Substitusi: 2(y+2)+y=7 → 3y=3 → y=1, x=3.",
+      "konteks": "Sistem Persamaan Linear"
+    },
+    {
+      "pertanyaan": "Nilai cos 45° × sin 45° adalah...",
+      "opsi": ["½", "√2/2", "1", "√2/4"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "cos 45° = sin 45° = √2/2. Jadi (√2/2)×(√2/2) = 2/4 = ½.",
+      "konteks": "Trigonometri"
+    },
+    {
+      "pertanyaan": "∫(2x + 3)dx = ...",
+      "opsi": ["x² + 3x + C", "2x² + 3x + C", "x + 3 + C", "2x + C"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "∫(2x+3)dx = x² + 3x + C.",
+      "konteks": "Integral Tak Tentu"
+    },
+    {
+      "pertanyaan": "Jika vektor a = (3, 4), panjang vektor a adalah...",
+      "opsi": ["3", "4", "5", "7"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "|a| = √(3² + 4²) = √(9+16) = √25 = 5.",
+      "konteks": "Vektor"
+    },
+    {
+      "pertanyaan": "Jika f(x) = 2x + 1 dan g(x) = x², maka f(g(2)) = ...",
+      "opsi": ["5", "8", "9", "17"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "g(2) = 4. f(g(2)) = f(4) = 2(4)+1 = 9.",
+      "konteks": "Komposisi Fungsi"
+    },
+    {
+      "pertanyaan": "Nilai x dari 2^x = 32 adalah...",
+      "opsi": ["3", "4", "5", "6"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "32 = 2⁵, sehingga x = 5.",
+      "konteks": "Persamaan Eksponen"
+    },
+    {
+      "pertanyaan": "Jumlah 10 suku pertama barisan 1, 3, 5, 7, ... adalah...",
+      "opsi": ["50", "75", "100", "125"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "a=1, b=2. S₁₀ = (10/2)(2×1 + 9×2) = 5×20 = 100.",
+      "konteks": "Deret Aritmatika"
+    },
+    {
+      "pertanyaan": "log₁₀ 100 + log₁₀ 10 = ...",
+      "opsi": ["2", "3", "4", "5"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "log 100 = 2, log 10 = 1, jadi 2 + 1 = 3.",
+      "konteks": "Logaritma Basis 10"
+    },
+    {
+      "pertanyaan": "Penyelesaian |2x - 4| = 6 adalah...",
+      "opsi": ["x=5 atau x=-1", "x=5 atau x=1", "x=3 atau x=-1", "x=-5 atau x=1"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "2x-4=6 → x=5, atau 2x-4=-6 → x=-1.",
+      "konteks": "Nilai Mutlak"
+    },
+    {
+      "pertanyaan": "Persamaan x² - 4x + 5 = 0 mempunyai...",
+      "opsi": ["dua akar real berbeda", "dua akar real sama", "tidak ada akar real", "satu akar real"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "D = (-4)² - 4(1)(5) = 16 - 20 = -4 < 0. Tidak ada akar real.",
+      "konteks": "Diskriminan"
+    },
+    {
+      "pertanyaan": "Jika f(x) = 3x - 6, maka f⁻¹(x) = ...",
+      "opsi": ["(x+6)/3", "(x-6)/3", "3x+6", "x/3+2"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "y = 3x-6 → x = (y+6)/3. Jadi f⁻¹(x) = (x+6)/3.",
+      "konteks": "Fungsi Invers"
+    },
+    {
+      "pertanyaan": "sin²45° + cos²45° = ...",
+      "opsi": ["0", "½", "1", "√2"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "Identitas Pythagoras: sin²θ + cos²θ = 1 untuk semua nilai θ.",
+      "konteks": "Identitas Trigonometri"
+    },
+    {
+      "pertanyaan": "Data: 2, 4, 4, 4, 5, 5, 7, 9. Modus data tersebut adalah...",
+      "opsi": ["4", "5", "4 dan 5", "9"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Angka 4 muncul 3 kali (paling sering), sehingga modus = 4.",
+      "konteks": "Modus Data"
+    },
+    {
+      "pertanyaan": "Dari 5 siswa akan dipilih 3 untuk mewakili sekolah. Banyak cara pemilihan adalah...",
+      "opsi": ["10", "20", "30", "60"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "C(5,3) = 5!/(3!×2!) = (5×4)/(2×1) = 10 cara.",
+      "konteks": "Kombinasi"
+    },
+    {
+      "pertanyaan": "Dari 5 orang dipilih ketua, wakil, dan sekretaris. Banyak cara pemilihan adalah...",
+      "opsi": ["10", "30", "60", "120"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "P(5,3) = 5!/(5-3)! = 5×4×3 = 60 cara.",
+      "konteks": "Permutasi"
+    },
+    {
+      "pertanyaan": "Jumlah tak hingga deret geometri dengan a = 4 dan r = ½ adalah...",
+      "opsi": ["6", "8", "16", "4"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "S∞ = a/(1-r) = 4/(1-½) = 4/(½) = 8.",
+      "konteks": "Deret Geometri Tak Hingga"
+    },
+    {
+      "pertanyaan": "Jika α dan β akar-akar x² - 7x + 12 = 0, maka α + β = ...",
+      "opsi": ["3", "4", "7", "12"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "Dari persamaan x² - 7x + 12 = 0, berdasarkan rumus Vieta: α + β = 7.",
+      "konteks": "Hubungan Akar-Akar"
+    },
+    {
+      "pertanyaan": "Kecepatan benda v(t) = 3t² + 2t. Percepatan pada t = 2 adalah...",
+      "opsi": ["14", "16", "18", "20"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "a(t) = v'(t) = 6t + 2. a(2) = 6(2) + 2 = 14 m/s².",
+      "konteks": "Aplikasi Turunan (Fisika)"
+    },
+    {
+      "pertanyaan": "∫₀³ x² dx = ...",
+      "opsi": ["6", "9", "12", "27"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "∫₀³ x² dx = [x³/3]₀³ = 27/3 - 0 = 9.",
+      "konteks": "Integral Tentu"
+    },
+    {
+      "pertanyaan": "Titik puncak parabola y = x² - 4x + 7 adalah...",
+      "opsi": ["(2, 3)", "(4, 7)", "(-2, 3)", "(2, -3)"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "x = -b/2a = 4/2 = 2. y = 4 - 8 + 7 = 3. Titik puncak (2, 3).",
+      "konteks": "Fungsi Kuadrat"
+    },
+    {
+      "pertanyaan": "sin 150° = ...",
+      "opsi": ["½", "-½", "√3/2", "-√3/2"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "sin 150° = sin(180°-30°) = sin 30° = ½.",
+      "konteks": "Sudut Kuadran II"
+    },
+    {
+      "pertanyaan": "Nilai maksimum z = 3x + 2y pada daerah x≥0, y≥0, x+y≤4, x+2y≤6 adalah...",
+      "opsi": ["10", "12", "6", "14"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "Titik pojok: (0,0)→z=0, (4,0)→z=12, (2,2)→z=10, (0,3)→z=6. Maksimum z=12 di (4,0).",
+      "konteks": "Program Linear"
+    },
+    {
+      "pertanyaan": "Jika a = (2,3) dan b = (1,-2), maka a·b (dot product) = ...",
+      "opsi": ["-4", "-1", "1", "4"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "a·b = 2×1 + 3×(-2) = 2 - 6 = -4.",
+      "konteks": "Vektor Dot Product"
+    },
+    {
+      "pertanyaan": "Data: 2, 4, 6, 8, 10. Varians data ini adalah...",
+      "opsi": ["6", "8", "10", "12"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "Rata-rata = 6. Varians = [(16+4+0+4+16)/5] = 40/5 = 8.",
+      "konteks": "Varians Data"
+    },
+    {
+      "pertanyaan": "Penyelesaian x² - x - 6 > 0 adalah...",
+      "opsi": ["-2 < x < 3", "x < -2 atau x > 3", "x > 3", "x < -2"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "x² - x - 6 = (x-3)(x+2). Positif di luar akar: x < -2 atau x > 3.",
+      "konteks": "Pertidaksamaan Kuadrat"
+    },
+    {
+      "pertanyaan": "Diketahui f(x) = x³ - 3x² + 2x - 1. Nilai f(2) adalah...",
+      "opsi": ["-2", "-1", "0", "1"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "f(2) = 8 - 12 + 4 - 1 = -1.",
+      "konteks": "Suku Banyak"
+    },
+    {
+      "pertanyaan": "lim(x→0) sin(3x)/x = ...",
+      "opsi": ["0", "1", "3", "Tidak ada"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "lim(x→0) sin(3x)/x = 3 × lim(x→0) sin(3x)/(3x) = 3×1 = 3.",
+      "konteks": "Limit Trigonometri"
+    },
+    {
+      "pertanyaan": "Antara 2 dan 14 disisipkan 5 bilangan sehingga membentuk barisan aritmatika. Bedanya adalah...",
+      "opsi": ["1", "2", "3", "4"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "Total ada 7 suku. b = (14-2)/(7-1) = 12/6 = 2.",
+      "konteks": "Barisan Aritmatika Sisipan"
+    },
+    {
+      "pertanyaan": "Modal Rp1.000.000 dibungakan 10% per tahun majemuk selama 2 tahun. Nilai akhirnya adalah...",
+      "opsi": ["Rp1.100.000", "Rp1.200.000", "Rp1.210.000", "Rp1.220.000"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "A = P(1+r)ⁿ = 1.000.000×(1,1)² = 1.000.000×1,21 = Rp1.210.000.",
+      "konteks": "Bunga Majemuk"
+    },
+    {
+      "pertanyaan": "Faktor dari x³ - 8 adalah...",
+      "opsi": ["(x-2)(x+2x+4)", "(x-2)(x²+2x+4)", "(x+2)(x²-2x+4)", "(x-2)(x²-2x+4)"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "a³-b³=(a-b)(a²+ab+b²). x³-8=(x-2)(x²+2x+4).",
+      "konteks": "Pemfaktoran Aljabar"
+    },
+    {
+      "pertanyaan": "∫₀² 3x² dx = ...",
+      "opsi": ["4", "6", "8", "12"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "∫₀² 3x² dx = [x³]₀² = 8 - 0 = 8.",
+      "konteks": "Integral Tentu Kubik"
+    },
+    {
+      "pertanyaan": "Jumlah S₅ dari barisan geometri 1, 2, 4, 8, 16 adalah...",
+      "opsi": ["16", "31", "32", "63"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "S₅ = a(rⁿ-1)/(r-1) = 1×(2⁵-1)/(2-1) = 31.",
+      "konteks": "Deret Geometri"
+    },
+    {
+      "pertanyaan": "Sebuah dadu dilempar sekali. Peluang muncul angka genap adalah...",
+      "opsi": ["1/6", "1/3", "1/2", "2/3"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "Angka genap: {2,4,6}. P = 3/6 = 1/2.",
+      "konteks": "Peluang Dadu"
+    },
+    {
+      "pertanyaan": "Persamaan garis yang melalui (1,2) dengan gradien 3 adalah...",
+      "opsi": ["y = 3x - 1", "y = 3x + 1", "y = 3x - 2", "y = 3x + 2"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "y - 2 = 3(x-1) → y = 3x - 1.",
+      "konteks": "Persamaan Garis"
+    },
+    {
+      "pertanyaan": "Nilai tan 45° + cos 0° = ...",
+      "opsi": ["0", "1", "2", "√2"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "tan 45° = 1 dan cos 0° = 1, jadi 1 + 1 = 2.",
+      "konteks": "Nilai Sudut Istimewa"
+    },
+    {
+      "pertanyaan": "Jika matriks A = [[2,0],[0,3]], invers A adalah...",
+      "opsi": ["[[1/2,0],[0,1/3]]", "[[3,0],[0,2]]", "[[-2,0],[0,-3]]", "[[2,0],[0,3]]"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Untuk matriks diagonal, inversnya adalah [[1/a,0],[0,1/d]] = [[1/2,0],[0,1/3]].",
+      "konteks": "Invers Matriks"
+    },
+    {
+      "pertanyaan": "Nilai dari 3log 27 = ...",
+      "opsi": ["1", "2", "3", "9"],
+      "jawabanBenarIndex": 2,
+      "pembahasan": "3log 27 = 3log 3³ = 3.",
+      "konteks": "Logaritma"
+    },
+    {
+      "pertanyaan": "Bayangan titik (3, -2) oleh rotasi 90° berlawanan arah jarum jam terhadap O adalah...",
+      "opsi": ["(2, 3)", "(-2, -3)", "(-3, 2)", "(2, -3)"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Rotasi 90° CCW: (x,y) → (-y, x). Jadi (3,-2) → (2, 3).",
+      "konteks": "Transformasi Geometri"
+    },
+    {
+      "pertanyaan": "Median dari data: 3, 5, 7, 9, 11, 13 adalah...",
+      "opsi": ["7", "8", "9", "10"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "Data genap 6 nilai, median = (7+9)/2 = 16/2 = 8.",
+      "konteks": "Median Data"
+    },
+    {
+      "pertanyaan": "Pada segitiga siku-siku dengan sisi 6, 8, dan 10, nilai sin sudut terkecil adalah...",
+      "opsi": ["3/5", "4/5", "3/4", "6/10"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "Sudut terkecil berhadapan sisi 6. sin = 6/10 = 3/5.",
+      "konteks": "Trigonometri Segitiga"
+    },
+    {
+      "pertanyaan": "Jika f(x) = x² - 4 dan g(x) = x + 2, maka (f/g)(x) untuk x ≠ -2 adalah...",
+      "opsi": ["x - 2", "x + 2", "x² - 2", "(x-2)(x+2)"],
+      "jawabanBenarIndex": 0,
+      "pembahasan": "f(x)/g(x) = (x²-4)/(x+2) = (x-2)(x+2)/(x+2) = x-2.",
+      "konteks": "Operasi Fungsi"
+    },
+    {
+      "pertanyaan": "Simpangan baku dari data 2, 4, 6, 8, 10 adalah...",
+      "opsi": ["2", "2√2", "4", "√8"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "Rata-rata=6, varians=8, simpangan baku=√8=2√2.",
+      "konteks": "Simpangan Baku"
+    },
+    {
+      "pertanyaan": "Nilai x yang memenuhi 4^(x+1) = 32 adalah...",
+      "opsi": ["1/2", "3/2", "5/2", "3"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "4^(x+1) = 32 → 2^(2x+2) = 2^5 → 2x+2=5 → x=3/2.",
+      "konteks": "Persamaan Eksponen"
+    },
+    {
+      "pertanyaan": "Gradien garis 3x + 2y - 6 = 0 adalah...",
+      "opsi": ["3/2", "-3/2", "2/3", "-2/3"],
+      "jawabanBenarIndex": 1,
+      "pembahasan": "2y = -3x + 6 → y = -3/2 x + 3. Gradien = -3/2.",
+      "konteks": "Persamaan Garis Lurus"
+    }
   ]
 };

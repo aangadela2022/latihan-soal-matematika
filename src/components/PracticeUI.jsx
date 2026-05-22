@@ -16,7 +16,7 @@ export default function PracticeUI({ user, onEndSession }) {
   // Kumpulkan statistik untuk sesi ini (skenario Riwayat)
   const [sessionScore, setSessionScore] = useState({ benar: 0, totalXpDidapat: 0 });
 
-  const TOPICS = ["Bilangan", "Aljabar", "Geometri", "Statistika", "Peluang"];
+  const TOPICS = ["Bilangan", "Aljabar", "Geometri", "Statistika", "Peluang", "TKA"];
   const currentTopicIndex = (user.history ? user.history.length : 0) % TOPICS.length;
   const allowedTopic = TOPICS[currentTopicIndex];
   const [selectedTopic, setSelectedTopic] = useState(allowedTopic);
@@ -60,8 +60,8 @@ export default function PracticeUI({ user, onEndSession }) {
                  </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                 {TOPICS.map((topic, idx) => {
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                 {TOPICS.filter(t => t !== 'TKA').map((topic, idx) => {
                     const isAllowed = idx === currentTopicIndex;
                     return (
                        <button 
@@ -76,6 +76,29 @@ export default function PracticeUI({ user, onEndSession }) {
                     );
                  })}
               </div>
+              {/* TKA sebagai topik ke-6 */}
+              {(() => {
+                 const tkaIdx = TOPICS.indexOf('TKA');
+                 const isAllowed = tkaIdx === currentTopicIndex;
+                 return (
+                    <button
+                       className={`btn w-full mb-8 ${isAllowed ? 'shadow-glow' : 'btn-outline shadow-none'}`}
+                       onClick={() => isAllowed && setSelectedTopic('TKA')}
+                       disabled={!isAllowed}
+                       style={{
+                          opacity: isAllowed ? 1 : 0.5,
+                          cursor: isAllowed ? 'pointer' : 'not-allowed',
+                          background: isAllowed ? 'linear-gradient(135deg, #7c3aed, #db2777)' : undefined,
+                          color: isAllowed ? 'white' : undefined,
+                          border: isAllowed ? 'none' : undefined,
+                          fontWeight: 700,
+                          letterSpacing: '0.05em'
+                       }}
+                    >
+                       🎓 TKA — Tes Kemampuan Akademik (SMA/SMK)
+                    </button>
+                 );
+              })()}
 
               <div className="flex gap-4">
                  <button className="btn btn-outline flex-1 shadow-none" onClick={onEndSession} disabled={loadingAI}>Batal</button>
